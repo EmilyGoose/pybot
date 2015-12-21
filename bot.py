@@ -72,7 +72,7 @@ def debug(msg):
 if sc.rtm_connect():
     print("Connected to Slack.")
     createlists()
-    debug("Bot started.")
+    debug("Bot V1 started.")
     readfile()
     while True:
         #Get new information from the channel
