@@ -13,12 +13,12 @@ userchannels = []
 def readfile():
     d = {}
     try:
-        with open("dict.txt", 'r') as f:
+        with open("usdict.txt", 'r') as f:
             for line in f:
                 (key, val) = line.split("|")
                 d[key] = ast.literal_eval(val)
     except:
-        f = open("dict.txt", 'w')
+        f = open("usdict.txt", 'w')
     f.close()
     return(d)
 
@@ -28,10 +28,10 @@ def newidea(name, text):
         d[name].append(text)
     except:
         d[name] = [text]
-    f = open("dict.txt", 'w')
+    f = open("usdict.txt", 'w')
     f.write("")
     f.close()
-    f = open("dict.txt", 'a')
+    f = open("usdict.txt", 'a')
     keys = list(d.keys())
     print(keys)
     print(d)
@@ -52,10 +52,6 @@ def createlists():
         except:
             userName = userlist[i]["name"]
         userNames.append(userName.lower())
-        if userName == "pybot":
-            #Remove the bot from the user list
-            userIDs.pop()
-            userNames.pop()
     for n in range(0, len(userIDs)):
         #Find the DM channels for each user
         openstring = str((sc.api_call("im.open", user=userIDs[n])))
