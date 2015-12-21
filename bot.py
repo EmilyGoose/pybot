@@ -1,9 +1,9 @@
 from slackclient import SlackClient
-import re, time
+import re, time, cfg
 from json import loads
 print("Ready to connect to Slack.")
 
-token = "xoxb-17040427299-bEqyZsrwKAusn6rpLmc7jeln"
+token = cfg.TOKEN
 sc = SlackClient(token)
 
 def createlists():
