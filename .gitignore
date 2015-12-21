@@ -110,3 +110,6 @@ $RECYCLE.BIN/
 
 # Bot token
 cfg.py
+
+# Dictionary
+dict.txt
