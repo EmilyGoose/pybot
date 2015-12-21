@@ -1,10 +1,14 @@
 from slackclient import SlackClient
-import re, time, cfg
+import re, time, cfg, ast
 from json import loads
 print("Ready to connect to Slack.")
 
 token = cfg.TOKEN
 sc = SlackClient(token)
+
+userIDs = []
+userNames = []
+userchannels = []
 
 def readfile():
     d = {}
@@ -12,11 +16,10 @@ def readfile():
         with open("dict.txt", 'r') as f:
             for line in f:
                 (key, val) = line.split("|")
-                d[key] = loads(val)
+                d[key] = ast.literal_eval(val)
     except:
         f = open("dict.txt", 'w')
     f.close()
-    print(d)
     return(d)
 
 def newidea(name, text):
@@ -48,7 +51,7 @@ def createlists():
             userName = userlist[i]["profile"]["first_name"]
         except:
             userName = userlist[i]["name"]
-        userNames.append(userName)
+        userNames.append(userName.lower())
         if userName == "pybot":
             #Remove the bot from the user list
             userIDs.pop()
@@ -66,14 +69,10 @@ def send(msgchannel, msgtext):
 def debug(msg):
     send("#pybotdebug", msg)
 
-userIDs = []
-userNames = []
-userchannels = []
-
 if sc.rtm_connect():
     print("Connected to Slack.")
     createlists()
-    #debug("Bot started.")
+    debug("Bot started.")
     readfile()
     while True:
         #Get new information from the channel
@@ -103,7 +102,7 @@ if sc.rtm_connect():
                             presencestatus = channelstatus[0]["presence"]
                             if userID in userIDs:
                                 userName = userNames[userIDs.index(userID)]
-                                print(userName + " is now " + presencestatus + ".")
+                                print(userName.title() + " is now " + presencestatus + ".")
                         elif statustype == "user_typing":
                             #Handle typing
                             if userID in userIDs:
@@ -120,17 +119,31 @@ if sc.rtm_connect():
                                 userchannel = userchannels[userpos]
                                 #This regex doesn't work if the message contains an apostrophe.
                                 message = channelstatus[0]['text']
-                                print(userName + " says: " + message)
+                                print(userName.title() + " says: " + message)
                                 if channelstatus[0]['channel'] == userchannel:
                                     if message.lower()[:5] == "hello":
                                         send(userchannel, "Hi!")
                                 if (message.lower()[:6] == "!idea:") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                     (m, idea) = message.split(": ")
-                                    #try:
-                                    newidea(userID, idea)
-                                    send("G0H17UA5S", userName + "'s idea has been added.")
-                                    #except:
-                                        #send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
+                                    try:
+                                        newidea(userID, idea)
+                                        send("G0H17UA5S", userName.title() + "'s idea has been added.")
+                                    except:
+                                        send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
+                                elif (message.lower()[:10] == "!getideas") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                    (m, name) = message.split(" ")
+                                    if name.lower() in userNames:
+                                        userpos = userNames.index(name)
+                                        userID = userIDs[userpos]
+                                        d = readfile()
+                                        if userID in d:
+                                            send("G0H17UA5S", "Ideas for " + name.lower().title() + ":")
+                                            for i in range(0, len(d[userID])):
+                                                send("G0H17UA5S", d[userID][i] + "\n")
+                                        else:
+                                            send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
+                                    else:
+                                        send("G0H17UA5S", "Name not found! Please try again!")
                             else:
                                 debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                         else:
