@@ -33,8 +33,6 @@ def newidea(name, text):
     f.close()
     f = open("usdict.txt", 'a')
     keys = list(d.keys())
-    print(keys)
-    print(d)
     for i in range(0, len(d)):
         f.write(keys[i] + "|" + str(d[keys[i]]))
 
@@ -58,6 +56,7 @@ def createlists():
         searchObj = re.search(r'"id":"(.*?)"', openstring)
         userchannel = searchObj.group(1)
         userchannels.append(userchannel)
+    return()
 
 def send(msgchannel, msgtext):
     sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
@@ -133,9 +132,10 @@ if sc.rtm_connect():
                                         userID = userIDs[userpos]
                                         d = readfile()
                                         if userID in d:
-                                            send("G0H17UA5S", "Ideas for " + name.lower().title() + ":")
+                                            s = ("Ideas for " + name.lower().title() + ":")
                                             for i in range(0, len(d[userID])):
-                                                send("G0H17UA5S", d[userID][i] + "\n")
+                                                s = (s + ("\n- " + d[userID][i]))
+                                            send("G0H17UA5S", s)
                                         else:
                                             send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
                                     else:
