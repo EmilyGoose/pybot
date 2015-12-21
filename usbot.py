@@ -133,7 +133,7 @@ if sc.rtm_connect():
                                 elif (message.lower()[:11] == "us!getideas") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                     (m, name) = message.split(" ")
                                     if name.lower() in userNames:
-                                        userpos = userNames.index(name)
+                                        userpos = userNames.index(name.lower())
                                         userID = userIDs[userpos]
                                         d = readfile()
                                         if userID in d:
