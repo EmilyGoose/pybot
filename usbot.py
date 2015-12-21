@@ -130,7 +130,7 @@ if sc.rtm_connect():
                                         send("G0H17UA5S", userName.title() + "'s idea has been added.")
                                     except:
                                         send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
-                                elif (message.lower()[:12] == "us!getideas") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                elif (message.lower()[:11] == "us!getideas") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                     (m, name) = message.split(" ")
                                     if name.lower() in userNames:
                                         userpos = userNames.index(name)
