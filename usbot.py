@@ -22,19 +22,23 @@ def readfile():
     f.close()
     return(d)
 
+def writedict(d):
+    s = ""
+    keys = list(d.keys())
+    for i in range(0, len(d)):
+        s = (s + keys[i] + "|" + str(d[keys[i]]) + "\n")
+    f = open("usdict.txt", 'w')
+    f.write(s)
+    f.close()
+
 def newidea(name, text):
     d = readfile()
     try:
         d[name].append(text)
     except:
         d[name] = [text]
-    f = open("usdict.txt", 'w')
-    f.write("")
-    f.close()
-    f = open("usdict.txt", 'a')
-    keys = list(d.keys())
-    for i in range(0, len(d)):
-        f.write(keys[i] + "|" + str(d[keys[i]]))
+    writedict(d)
+
 
 def createlists():
     #Get the user list
@@ -83,7 +87,7 @@ if sc.rtm_connect():
                 statustype = str(statustype)
                 if statustype == "hello":
                     #Filter out hello message from server
-                    print("Hello message recieved from server.")
+                    print("Hello message received from server.")
                 else:
                     #Find the user ID of the active user
                     try:
@@ -134,12 +138,25 @@ if sc.rtm_connect():
                                         if userID in d:
                                             s = ("Ideas for " + name.lower().title() + ":")
                                             for i in range(0, len(d[userID])):
-                                                s = (s + ("\n- " + d[userID][i]))
+                                                s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
                                             send("G0H17UA5S", s)
                                         else:
                                             send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
                                     else:
                                         send("G0H17UA5S", "Name not found! Please try again!")
+                                elif (message.lower()[:10] == "us!delidea") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                    (m, num) = message.split(" ")
+                                    try:
+                                        num = int(num) - 1
+                                        d = readfile()
+                                        if (num + 1) > len(d[userID]):
+                                            send("G0H17UA5S", "The number you entered is too large. Please try again.")
+                                        else:
+                                            e = d[userID].pop(num)
+                                            writedict(d)
+                                            send("G0H17UA5S", "Idea `" + e + "` deleted.")
+                                    except:
+                                        send("G0H17UA5S", "Invalid number. Please try again.")
                             else:
                                 debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                         else:
