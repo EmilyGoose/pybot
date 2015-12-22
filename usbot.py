@@ -136,10 +136,13 @@ if sc.rtm_connect():
                                         userID = userIDs[userpos]
                                         d = readfile()
                                         if userID in d:
-                                            s = ("Ideas for " + name.lower().title() + ":")
-                                            for i in range(0, len(d[userID])):
-                                                s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
-                                            send("G0H17UA5S", s)
+                                            if len(d[userID]) > 0:
+                                                s = ("Ideas for " + name.lower().title() + ":")
+                                                for i in range(0, len(d[userID])):
+                                                    s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
+                                                send("G0H17UA5S", s)
+                                            else:
+                                                send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
                                         else:
                                             send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
                                     else:
