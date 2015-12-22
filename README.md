@@ -6,13 +6,18 @@ Feel free to use my code, but please credit me (preferably via direct link to th
 
 # Usage
 
-!idea: \<text\>
+## !idea: \<text\>
 
 Enters an idea. Make sure there is a space after the colon
 
 
-!getideas \<name\>
+## !getideas \<name\>
 
 Gets an idea. Make sure the name matches the person's first name (if they haven't set one, their Slack username) as of the bot's last restart.
 Make sure there is a space between the command and the person's name.
+
+
+## !delidea \<*n*\>
+
+Deletes the *n*th idea in your list of ideas. It is reccomended to call !getideas first.
 
