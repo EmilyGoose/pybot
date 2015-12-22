@@ -2,7 +2,10 @@
 Bot for Slack built in Python
 
 This is a side project of mine, which hopefully will make it easy to keep track of ideas my team has for upcoming hackathons.
+
 Feel free to use my code, but please credit me (preferably via direct link to this repo). I try to comment it where possible.
+
+If you would like to make a pull request, please make it to "usbot.py". "bot.py" is my stable build.
 
 # Usage
 
