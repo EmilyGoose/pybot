@@ -69,7 +69,7 @@ def debug(msg):
     send("#pybotdebug", msg)
 
 if sc.rtm_connect():
-    print("Connected to Slack.")
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
     createlists()
     debug("Bot V2 started.")
     readfile()
@@ -77,10 +77,7 @@ if sc.rtm_connect():
         try:
             #Get new information from the channel
             channelstatus = sc.rtm_read()
-            if (channelstatus == []):
-                #Discard empty channel status
-                print("Nothing happened")
-            else:
+            if (channelstatus != []):
                 #Do literally everything
                 #Find the status type
                 statustype = channelstatus[0]["type"]
@@ -88,7 +85,7 @@ if sc.rtm_connect():
                     statustype = str(statustype)
                     if statustype == "hello":
                         #Filter out hello message from server
-                        print("Hello message received from server.")
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Hello message received from server.")
                     else:
                         #Find the user ID of the active user
                         try:
@@ -102,12 +99,12 @@ if sc.rtm_connect():
                                 presencestatus = channelstatus[0]["presence"]
                                 if userID in userIDs:
                                     userName = userNames[userIDs.index(userID)]
-                                    print(userName.title() + " is now " + presencestatus + ".")
+                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " is now " + presencestatus + ".")
                             elif statustype == "user_typing":
                                 #Handle typing
                                 if userID in userIDs:
                                     userName = userNames[userIDs.index(userID)]
-                                    print(userName + " is typing.")
+                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName + " is typing.")
                                 else:
                                     debug("User not found in list! Here are the details:\n" + str(channelstatus))
                             elif statustype == "message":
@@ -118,7 +115,7 @@ if sc.rtm_connect():
                                     userName = userNames[userpos]
                                     userchannel = userchannels[userpos]
                                     message = channelstatus[0]['text']
-                                    print(userName.title() + " says: " + message)
+                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                     if channelstatus[0]['channel'] == userchannel:
                                         if message.lower()[:5] == "hello":
                                             send(userchannel, "Hi!")
@@ -165,7 +162,7 @@ if sc.rtm_connect():
                             else:
                                 debug("Unimplemented status! Here are the details:\n" + str(channelstatus))
                         else:
-                            print("Pybot and/or Slackbot did something.")
+                            print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Pybot and/or Slackbot did something.")
                 else:
                     debug("This error should never happen. Here are the details:\n" + str(channelstatus))
             time.sleep(0.5)
