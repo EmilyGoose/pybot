@@ -1,5 +1,5 @@
 from slackclient import SlackClient
-import re, time, cfg, ast
+import re, time, cfg, ast, sys
 from json import loads
 print("Ready to connect to Slack.")
 
@@ -87,7 +87,7 @@ if sc.rtm_connect():
     debug("Bot (unstable version) started.")
     readfile()
     crashTimes = []
-    timesCrashed = 1
+    timesCrashed = 0
     while True:
         try:
             #Get new information from the channel
@@ -196,18 +196,19 @@ if sc.rtm_connect():
                 else:
                     debug("This error should never happen. Here are the details:\n" + str(channelstatus))
         except:
-            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting!")
-            if timesCrashed:
-                crashTimes.append(time.time())
-                if len(crashTimes) == 30:
-                    if (crashTimes[30] - crashTimes[0]) < 60:
-                        crashTimes.pop(0)
-                    else:
-                        try:
-                            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Too many unhandled exceptions! Shutting down...")
-                        except:
-                            break
+            timesCrashed += 1
+            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ")")
+            crashTimes.append(time.time())
+            if len(crashTimes) == 30:
+                print(crashTimes)
+                if (crashTimes[29] - crashTimes[0]) > 60:
+                    crashTimes.pop(0)
+                else:
+                    try:
+                        debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Too many unhandled exceptions! Shutting down...")
+                    except:
                         break
-            else:
-                print ("Something has gone horribly wrong and timesCrashed no longer exists")
+                    break
         time.sleep(0.5)
+#Exit the program (Only happens if something bad happened)
+sys.exit()
