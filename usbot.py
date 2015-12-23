@@ -103,7 +103,7 @@ if sc.rtm_connect():
                     try:
                         userID = channelstatus[0]["user"]
                     except:
-                        debug("Unknown status! Here are the details:\n" + str(channelstatus))
+                        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": No user attached to status.")
                     if not (userID == "U0H16CK8T" or userID == "USLACKBOT"):
                         #Only run if the user is not pybot or Slackbot
                         if statustype == "presence_change":
@@ -120,11 +120,11 @@ if sc.rtm_connect():
                             else:
                                 debug("User not found in list! Here are the details:\n" + str(channelstatus))
                         elif statustype == "message":
-                            try:
+                            if 'subtype' in channelstatus[0]:
                                 #Filter out 'messages' with a subtype
                                 #(Gets rid of bots and edits)
-                                subtype = channelstatus[0]['subtype']
-                            except:
+                                print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Message with a subtype found.")
+                            else:
                                 if userID in userIDs:
                                     #Find where the user is in the lists
                                     userpos = userIDs.index(userID)
