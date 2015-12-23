@@ -88,8 +88,7 @@ if sc.rtm_connect():
     readfile()
     crashTimes = []
     timesCrashed = 1
-    
-    while True and len(crashTimes) < 31:
+    while True:
         try:
             #Get new information from the channel
             channelstatus = sc.rtm_read()
@@ -197,14 +196,16 @@ if sc.rtm_connect():
                 else:
                     debug("This error should never happen. Here are the details:\n" + str(channelstatus))
         except:
-                debug(time.strftime("%Y-%m-%d %H:%M:%S") + " Fatal error encountered. Restarting!")
-                if timesCrashed:
-                    crashTimes.appendtime.(datetime.datetime.now())
-                    if crashTimes[30]:
-                        if crashTimes[1] - crashTimes[30] < (0:01:00):
-                            crashTimes.pop(1)
-                        else: timesCrashed = timesCrashed + 1
-                    else: timesCrashed = timesCrashed + 1
-                else: print ("Something has gone horribly wrong and timesCrashed no longer exists")
-print ("Pybot has crashed over 30 times within one minutes. I shall now go die in a hole.")
+            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting!")
+            if timesCrashed:
+                crashTimes.append(time(datetime.datetime.now())
+                if crashTimes[30]:
+                    if crashTimes[1] - crashTimes[30] < (0:01:00):
+                        crashTimes.pop(1)
+                    else:
+                        try:
+                            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Too many unhandled exceptions! Shutting down...") 
+                        break
+            else:
+                print ("Something has gone horribly wrong and timesCrashed no longer exists")
         time.sleep(0.5)
