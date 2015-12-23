@@ -198,13 +198,15 @@ if sc.rtm_connect():
         except:
             debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting!")
             if timesCrashed:
-                crashTimes.append(time(datetime.datetime.now())
+                crashTimes.append(time.time())
                 if crashTimes[30]:
-                    if crashTimes[1] - crashTimes[30] < (0:01:00):
+                    if crashTimes[1] - crashTimes[30] < (60):
                         crashTimes.pop(1)
                     else:
                         try:
-                            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Too many unhandled exceptions! Shutting down...") 
+                            debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Too many unhandled exceptions! Shutting down...")
+                        except:
+                            break
                         break
             else:
                 print ("Something has gone horribly wrong and timesCrashed no longer exists")
