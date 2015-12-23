@@ -199,7 +199,7 @@ if sc.rtm_connect():
             debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting!")
             if timesCrashed:
                 crashTimes.append(time.time())
-                if crashTimes[30]:
+                if len(crashTimes) == 30:
                     if crashTimes[1] - crashTimes[30] < (60):
                         crashTimes.pop(1)
                     else:
