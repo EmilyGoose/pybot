@@ -200,8 +200,8 @@ if sc.rtm_connect():
             if timesCrashed:
                 crashTimes.append(time.time())
                 if len(crashTimes) == 30:
-                    if crashTimes[1] - crashTimes[30] < (60):
-                        crashTimes.pop(1)
+                    if (crashTimes[30] - crashTimes[0]) < 60:
+                        crashTimes.pop(0)
                     else:
                         try:
                             debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Too many unhandled exceptions! Shutting down...")
