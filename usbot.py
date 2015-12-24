@@ -135,6 +135,7 @@ if sc.rtm_connect():
                                         userName = userNames[userpos]
                                         #Get the full text of the message
                                         message = channelstatus[0]['text']
+                                        message.strip()
                                         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                         #Handle new ideas
                                         if (message.lower()[:8] == "us!idea:") and (channelstatus[0]['channel'] == "G0H17UA5S"):
