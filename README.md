@@ -22,5 +22,5 @@ Make sure there is a space between the command and the person's name.
 
 ## !delidea \<*n*\>
 
-Deletes the *n*th idea in your list of ideas. It is reccomended to call !getideas first.
+Deletes the *n*th idea in your list of ideas. It is reccommended to call !getideas first.
 
