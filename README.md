@@ -9,18 +9,24 @@ If you want to add it to your own Slack channel, create cfg.py and set TOKEN to 
 
 # Usage
 
-## !idea: \<text\>
+### !idea: \<text\>
 
 Enters an idea. Make sure there is a space after the colon
 
 
-## !getideas \<name\>
+### !getideas \<name\>
 
 Gets an idea. Make sure the name matches the person's first name (if they haven't set one, their Slack username) as of the bot's last restart.
 Make sure there is a space between the command and the person's name.
 
 
-## !delidea \<*n*\>
+### !delidea \<*n*\>
 
 Deletes the *n*th idea in your list of ideas. It is reccommended to call !getideas first.
 
+# New in v3.0
+
+### Bug fixes:
+
+* Ideas containing the character "|" no longer wipe the text file
+* Bot now automatically restarts after running for 2.5 hours
