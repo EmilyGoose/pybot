@@ -143,7 +143,7 @@ while True:
                                             message.strip()
                                             print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                             #Handle new ideas
-                                            if (message.lower()[:8] == "us!idea:") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                            if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                                 (m, idea) = message.split(": ", maxsplit = 1)
                                                 try:
                                                     newidea(userID, idea)
@@ -151,8 +151,8 @@ while True:
                                                 except:
                                                     send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
                                             #Handle !getideas calls
-                                            elif (message.lower()[:11] == "us!getideas") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, name) = message.split(maxsplit = 1)
+                                            elif (message.lower()[:12] == "us!getideas ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                                (m, name) = message.split(" ", maxsplit = 1)
                                                 #Check if the user exists
                                                 if name.lower() in userNames:
                                                     userpos = userNames.index(name.lower())
@@ -175,11 +175,13 @@ while True:
                                                 else:
                                                     send("G0H17UA5S", "Name not found! Please try again!")
                                             #Handle idea deletion
-                                            elif (message.lower()[:10] == "us!delidea") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, num) = message.split(maxsplit = 1)
+                                            elif (message.lower()[:11] == "us!delidea ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                                (m, num) = message.split(" ",maxsplit = 1)
                                                 try:
                                                     #Makes sure "1" points to d[userID][0]
                                                     num = int(num) - 1
+                                                    if num < 0:
+                                                        num = num + 1
                                                     #Grab the dictionary from the text file
                                                     d = readfile()
                                                     #Make sure the number is not greater than the amount of elements
