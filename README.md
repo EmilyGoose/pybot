@@ -24,9 +24,6 @@ Make sure there is a space between the command and the person's name.
 
 Deletes the *n*th idea in your list of ideas. It is reccommended to call !getideas first.
 
-# New in v3.0
+# New since v3.0
 
-### Bug fixes:
-
-* Ideas containing the character "|" no longer wipe the text file
-* Bot now automatically restarts after running for 2.5 hours
+Nothing here yet!
