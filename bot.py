@@ -202,6 +202,9 @@ while True:
                                             debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                                 elif statustype == "reaction_added":
                                     print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Reaction added somewhere. Too lazy to figure out where.")
+                                elif statustype == "user_change":
+                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": A user changed their profile info.")
+                                    createlists()
                                 else:
                                     debug("Unimplemented status! Here are the details:\n" + str(channelstatus))
                             else:
