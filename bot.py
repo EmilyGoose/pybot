@@ -1,4 +1,4 @@
-import re, time, cfg, ast, sys, importlib, slackclient
+import re, time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
 
@@ -89,7 +89,7 @@ while True:
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
         createlists()
-        debug("Bot v3.0 started.")
+        debug("Bot v3.1 started.")
         readfile()
         crashTimes = []
         timesCrashed = 0
@@ -195,10 +195,16 @@ while True:
                                                         send("G0H17UA5S", "Idea `" + e.replace("`", "'") + "` deleted.")
                                                 except:
                                                     send("G0H17UA5S", "Invalid number. Please try again.")
+                                            #Steal server info
+                                            elif (message.lower()[:12] == "!machineinfo") and (channelstatus[0]['channel'] == "G0H17UA5S"):  
+                                                send("G0H17UA5S", platform.node() + ' '.join(platform.dist()[:2]))
                                         else:
                                             debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                                 elif statustype == "reaction_added":
                                     print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Reaction added somewhere. Too lazy to figure out where.")
+                                elif statustype == "user_change":
+                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": A user changed their profile info.")
+                                    createlists()
                                 else:
                                     debug("Unimplemented status! Here are the details:\n" + str(channelstatus))
                             else:

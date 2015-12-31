@@ -24,9 +24,16 @@ Make sure there is a space between the command and the person's name.
 
 Deletes the *n*th idea in your list of ideas. It is reccommended to call !getideas first.
 
-# New in v3.0
+### !machineinfo
 
-### Bug fixes:
+Displays information about the machine running the bot
 
-* Ideas containing the character "|" no longer wipe the text file
-* Bot now automatically restarts after running for 2.5 hours
+# New in v3.1
+
+### Commands
+
+* !machineinfo (See above)
+
+### Misc
+
+* User lists now automatically rebuild if a user changes their name
