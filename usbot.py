@@ -192,7 +192,7 @@ while True:
                                                         e = d[userID].pop(num)
                                                         #Rebuild the dictionary
                                                         writedict(d)
-                                                        send("G0H17UA5S", "Idea `" + e + "` deleted.")
+                                                        send("G0H17UA5S", "Idea `" + e.replace("`", "'") + "` deleted.")
                                                 except:
                                                     send("G0H17UA5S", "Invalid number. Please try again.")
                                         else:
