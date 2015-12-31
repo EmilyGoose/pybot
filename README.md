@@ -33,3 +33,7 @@ Displays information about the machine running the bot
 ### Commands
 
 * !machineinfo (See above)
+
+### Misc
+
+* User lists now automatically rebuild if a user changes their name
