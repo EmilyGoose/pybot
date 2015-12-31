@@ -7,7 +7,7 @@ while True:
     starttime = time.time()
     print("Ready to connect to Slack.")
 
-    token = cfg.USTOKEN
+    token = cfg.TOKEN
     sc = SlackClient(token)
 
     userIDs = []
@@ -89,7 +89,7 @@ while True:
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
         createlists()
-        debug("Bot (unstable version) started.")
+        debug("Bot v3.1 started.")
         readfile()
         crashTimes = []
         timesCrashed = 0
@@ -143,7 +143,7 @@ while True:
                                             message.strip()
                                             print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                             #Handle new ideas
-                                            if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                            if (message.lower()[:7] == "!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                                 (m, idea) = message.split(": ", maxsplit = 1)
                                                 try:
                                                     newidea(userID, idea)
@@ -151,7 +151,7 @@ while True:
                                                 except:
                                                     send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
                                             #Handle !getideas calls
-                                            elif (message.lower()[:12] == "us!getideas ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                            elif (message.lower()[:10] == "!getideas ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                                 (m, name) = message.split(" ", maxsplit = 1)
                                                 #Check if the user exists
                                                 if name.lower() in userNames:
@@ -175,7 +175,7 @@ while True:
                                                 else:
                                                     send("G0H17UA5S", "Name not found! Please try again!")
                                             #Handle idea deletion
-                                            elif (message.lower()[:11] == "us!delidea ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                            elif (message.lower()[:9] == "!delidea ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                                 (m, num) = message.split(" ",maxsplit = 1)
                                                 try:
                                                     #Makes sure "1" points to d[userID][0]
@@ -196,7 +196,7 @@ while True:
                                                 except:
                                                     send("G0H17UA5S", "Invalid number. Please try again.")
                                             #Steal server info
-                                            elif (message.lower()[:14] == "us!machineinfo") and (channelstatus[0]['channel'] == "G0H17UA5S"):  
+                                            elif (message.lower()[:12] == "!machineinfo") and (channelstatus[0]['channel'] == "G0H17UA5S"):  
                                                 send("G0H17UA5S", platform.node() + ' '.join(platform.dist()[:2]))
                                         else:
                                             debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")

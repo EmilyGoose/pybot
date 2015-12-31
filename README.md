@@ -28,7 +28,7 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 Displays information about the machine running the bot
 
-# New since v3.0
+# New in v3.1
 
 ### Commands
 
