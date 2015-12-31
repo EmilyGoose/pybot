@@ -26,4 +26,6 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 # New since v3.0
 
-Nothing here yet!
+### !WhereAreUNow
+
+Returns server info.
