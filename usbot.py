@@ -210,15 +210,14 @@ while True:
                 debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ")")
                 crashTimes.append(time.time())
                 if len(crashTimes) == 10:
-                    print(crashTimes)
                     if (crashTimes[9] - crashTimes[0]) > 60:
                         crashTimes.pop(0)
                     else:
                         try:
                             debug("Too many unhandled exceptions! Shutting down...")
                         except:
-                            break
-                        break
+                            sys.exit()
+                        sys.exit()
             time.sleep(0.5)
         debug("Program running for over 2.5 hours. Restarting!")
 #Exit the program (Only happens if something bad happened)
