@@ -19,7 +19,7 @@ while True:
         d = {}
         try:
             #Open the file
-            with open("usdict.txt", 'r') as f:
+            with open("dict.txt", 'r') as f:
                 #Iterate through the lines
                 for line in f:
                     #Grab the keys and values
@@ -28,7 +28,7 @@ while True:
                     d[key] = ast.literal_eval(val)
         except:
             #Create a new file if it doesn't exist
-            f = open("usdict.txt", 'w')
+            f = open("dict.txt", 'w')
         f.close()
         return(d)
 
@@ -40,7 +40,7 @@ while True:
         for i in range(0, len(d)):
             #Write each line of the file with the proper syntax
             s = (s + keys[i] + "|" + str(d[keys[i]]) + "\n")
-        f = open("usdict.txt", 'w')
+        f = open("dict.txt", 'w')
         #Overwrite the file with the new content
         f.write(s)
         f.close()
