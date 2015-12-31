@@ -23,7 +23,7 @@ while True:
                 #Iterate through the lines
                 for line in f:
                     #Grab the keys and values
-                    (key, val) = line.split("|")
+                    (key, val) = line.split("|", maxsplit = 1)
                     #Rebuild the dictionary
                     d[key] = ast.literal_eval(val)
         except:
@@ -152,7 +152,7 @@ while True:
                                                     send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
                                             #Handle !getideas calls
                                             elif (message.lower()[:11] == "us!getideas") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, name) = message.split (maxsplit = 1)
+                                                (m, name) = message.split(maxsplit = 1)
                                                 #Check if the user exists
                                                 if name.lower() in userNames:
                                                     userpos = userNames.index(name.lower())
@@ -176,7 +176,7 @@ while True:
                                                     send("G0H17UA5S", "Name not found! Please try again!")
                                             #Handle idea deletion
                                             elif (message.lower()[:10] == "us!delidea") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, num) = message.split (maxsplit = 1)
+                                                (m, num) = message.split(maxsplit = 1)
                                                 try:
                                                     #Makes sure "1" points to d[userID][0]
                                                     num = int(num) - 1
