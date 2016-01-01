@@ -176,7 +176,7 @@ while True:
                                                     send("G0H17UA5S", "Name not found! Please try again!")
                                             #Handle idea deletion
                                             elif (message.lower()[:9] == "!delidea ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, num) = message.split(" ",maxsplit = 1)
+                                                (m, num) = (message.split(maxsplit = 1)).strip()
                                                 try:
                                                     #Makes sure "1" points to d[userID][0]
                                                     num = int(num) - 1
