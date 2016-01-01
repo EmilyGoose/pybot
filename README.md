@@ -9,18 +9,31 @@ If you want to add it to your own Slack channel, create cfg.py and set TOKEN to 
 
 # Usage
 
-## !idea: \<text\>
+### !idea: \<text\>
 
 Enters an idea. Make sure there is a space after the colon
 
 
-## !getideas \<name\>
+### !getideas \<name\>
 
 Gets an idea. Make sure the name matches the person's first name (if they haven't set one, their Slack username) as of the bot's last restart.
 Make sure there is a space between the command and the person's name.
 
 
-## !delidea \<*n*\>
+### !delidea \<*n*\>
 
-Deletes the *n*th idea in your list of ideas. It is reccomended to call !getideas first.
+Deletes the *n*th idea in your list of ideas. It is reccommended to call !getideas first.
 
+### !machineinfo
+
+Displays information about the machine running the bot
+
+# New in v3.1
+
+### Commands
+
+* !machineinfo (See above)
+
+### Misc
+
+* User lists now automatically rebuild if a user changes their name
