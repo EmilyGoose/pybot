@@ -144,7 +144,7 @@ while True:
                                             print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                             #Handle new ideas
                                             if (message.lower()[:7] == "!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, idea) = message.split(": ", maxsplit = 1)
+                                                (m, idea) = (message.split(maxsplit = 1)).strip()
                                                 try:
                                                     newidea(userID, idea)
                                                     send("G0H17UA5S", userName.title() + "'s idea has been added.")
@@ -152,7 +152,7 @@ while True:
                                                     send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
                                             #Handle !getideas calls
                                             elif (message.lower()[:10] == "!getideas ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
-                                                (m, name) = message.split(" ", maxsplit = 1)
+                                                (m, name) = (message.split(maxsplit = 1)).strip()
                                                 #Check if the user exists
                                                 if name.lower() in userNames:
                                                     userpos = userNames.index(name.lower())
