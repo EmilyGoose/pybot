@@ -234,5 +234,3 @@ while True:
                         sys.exit()
             time.sleep(1)
         debug("Bot running for over 2.5 hours. Restarting!")
-#Exit the program
-sys.exit()
