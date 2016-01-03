@@ -227,6 +227,7 @@ while True:
                     else:
                         #Runs if there are > 10 crashes within one minute
                         try:
+                            print("Too many unhandled exceptions! Shutting down...")
                             debug("Too many unhandled exceptions! Shutting down...")
                         except:
                             pass
@@ -234,5 +235,3 @@ while True:
                         sys.exit()
             time.sleep(1)
         debug("Bot running for over 2.5 hours. Restarting!")
-#Exit the program
-sys.exit()
