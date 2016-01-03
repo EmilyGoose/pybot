@@ -197,7 +197,7 @@ while True:
                                                     send("G0H17UA5S", "Invalid number. Please try again.")
                                             #Steal server info
                                             elif (message.lower()[:14] == "us!machineinfo") and (channelstatus[0]['channel'] == "G0H17UA5S"):  
-                                                send("G0H17UA5S", platform.node() + ' '.join(platform.dist()[:2]))
+                                                send("G0H17UA5S", platform.node() + ' '.join(platform.dist()))
                                         else:
                                             debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                                 elif statustype == "reaction_added":
