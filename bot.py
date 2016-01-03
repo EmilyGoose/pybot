@@ -224,7 +224,7 @@ while True:
                         except:
                             sys.exit()
                         sys.exit()
-            time.sleep(0.5)
+            time.sleep(1)
         debug("Program running for over 2.5 hours. Restarting!")
 #Exit the program (Only happens if something bad happened)
 sys.exit()
