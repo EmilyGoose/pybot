@@ -89,11 +89,12 @@ while True:
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
         createlists()
-        debug("Bot v3.1 started.")
+        debug("Bot v3.2 started.")
         readfile()
         crashTimes = []
         timesCrashed = 0
-        while True and (time.time() - starttime < 9000):
+        #Bot only runs for 2.5 hours before restarting
+        while time.time() - starttime < 9000:
             try:
                 #Get new information from the channel
                 channelstatus = sc.rtm_read()
@@ -197,12 +198,14 @@ while True:
                                                     send("G0H17UA5S", "Invalid number. Please try again.")
                                             #Steal server info
                                             elif (message.lower()[:12] == "!machineinfo") and (channelstatus[0]['channel'] == "G0H17UA5S"):  
-                                                send("G0H17UA5S", platform.node() + ' '.join(platform.dist()[:2]))
+                                                send("G0H17UA5S", platform.node() + ' '.join(platform.dist()))
                                         else:
                                             debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
-                                elif statustype == "reaction_added":
-                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Reaction added somewhere. Too lazy to figure out where.")
+                                elif statustype == "reaction_added" or statustype == "reaction_removed":
+                                    #Handle reactions and whatnot
+                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Reaction added/removed somewhere. Too lazy to figure out where.")
                                 elif statustype == "user_change":
+                                    #Rebuild userlist if someone changes their name
                                     print(time.strftime("%Y-%m-%d %H:%M:%S") + ": A user changed their profile info.")
                                     createlists()
                                 else:
@@ -212,19 +215,24 @@ while True:
                     else:
                         debug("This error should never happen. Here are the details:\n" + str(channelstatus))
             except:
+                #Handle unhandled exceptions
+                #Keep track of the number of exceptions
                 timesCrashed += 1
                 debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ")")
+                #Create a list of exceptions, up to 10 
                 crashTimes.append(time.time())
                 if len(crashTimes) == 10:
                     if (crashTimes[9] - crashTimes[0]) > 60:
                         crashTimes.pop(0)
                     else:
+                        #Runs if there are > 10 crashes within one minute
                         try:
                             debug("Too many unhandled exceptions! Shutting down...")
                         except:
-                            sys.exit()
+                            pass
+                        #Exit the program
                         sys.exit()
-            time.sleep(0.5)
-        debug("Program running for over 2.5 hours. Restarting!")
-#Exit the program (Only happens if something bad happened)
+            time.sleep(1)
+        debug("Bot running for over 2.5 hours. Restarting!")
+#Exit the program
 sys.exit()

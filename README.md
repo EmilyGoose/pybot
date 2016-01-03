@@ -28,12 +28,13 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 Displays information about the machine running the bot
 
-# New in v3.1
-
-### Commands
-
-* !machineinfo (See above)
+# New in v3.2
 
 ### Misc
 
-* User lists now automatically rebuild if a user changes their name
+* Changed refresh interval for rtm_read() calls
+
+### Fixes
+
+* Made exception handling code more efficient
+* Fixed handling of reactions
