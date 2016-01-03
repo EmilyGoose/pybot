@@ -227,6 +227,7 @@ while True:
                     else:
                         #Runs if there are > 10 crashes within one minute
                         try:
+                            print("Too many unhandled exceptions! Shutting down...")
                             debug("Too many unhandled exceptions! Shutting down...")
                         except:
                             pass
