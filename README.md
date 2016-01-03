@@ -30,4 +30,6 @@ Displays information about the machine running the bot
 
 # New since v3.1
 
-Nothing here yet!
+### Misc
+
+* Changed refresh interval for rtm_read() calls
