@@ -28,13 +28,6 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 Displays information about the machine running the bot
 
-# New in v3.2
+# New in v3.2.1
 
-### Misc
-
-* Changed refresh interval for rtm_read() calls
-
-### Fixes
-
-* Made exception handling code more efficient
-* Fixed handling of reactions
+I just thought this would look cool on the network graph
