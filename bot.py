@@ -2,10 +2,7 @@ import re, time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
 
-#TODO: Move bot into a class and fix all the things
-#TODO: Handle editing of messages
-#TODO: Fix EVERYTHING from line 79 to line 85
-#TODO: Have bot grab its own userID
+#Edit this stuff in the Sandbox build. This one is at least somewhat stable.
 
 while True:
     importlib.reload(slackclient)
