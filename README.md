@@ -30,4 +30,5 @@ Displays information about the machine running the bot
 
 # New since v3.2.1
 
-* Nothing here yet!
+* Cleaned up existing code
+* Killed useless code
