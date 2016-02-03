@@ -2,6 +2,11 @@ import re, time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
 
+#TODO: Move bot into a class and fix all the things
+#TODO: Handle editing of messages
+#TODO: Fix EVERYTHING from line 79 to line 85
+#TODO: Have bot grab its own userID
+
 while True:
     importlib.reload(slackclient)
     starttime = time.time()
@@ -12,26 +17,27 @@ while True:
 
     userIDs = []
     userNames = []
-    userchannels = []
 
     def readfile():
         #Initialize placeholder empty dictionary
         d = {}
         try:
-            #Open the file
+            #Open the file (no idea what this does but it works)
             with open("dict.txt", 'r') as f:
                 #Iterate through the lines
                 for line in f:
                     #Grab the keys and values
                     (key, val) = line.split("|", maxsplit = 1)
                     #Rebuild the dictionary
+                    #Literally no clue how this line works
                     d[key] = ast.literal_eval(val)
         except:
-            #Create a new file if it doesn't exist
+            #Create a new file if dict.txt doesn't exist
+            #Or if an error happens. I'll fix that later.
             f = open("dict.txt", 'w')
         f.close()
         return(d)
-
+    
     def writedict(d):
         #Create placeholder empty string
         s = ""
@@ -44,11 +50,11 @@ while True:
         #Overwrite the file with the new content
         f.write(s)
         f.close()
+        return()
 
     def newidea(name, text):
         #Grab the dictionary from the file
         d = readfile()
-        text = text.strip()
         try:
             #Add the idea to the user's list of ideas
             d[name].append(text)
@@ -56,28 +62,23 @@ while True:
             #Create the user in the dictionary if they don't exist
             d[name] = [text]
         writedict(d)
-
+        return()
 
     def createlists():
         #Get the user list
-        userlist = loads(str(sc.api_call("users.list").decode("utf-8")))['members']
+        #Removed str(), put it back if something happens
+        userlist = loads(sc.api_call("users.list").decode("utf-8"))['members']
         #Parse for user IDs
         for i in range(0, len(userlist)):
             userID = userlist[i]["id"]
             userIDs.append(userID)
             #Find the user's name
             try:
-                #Find the user's username if they haven't set a name
                 userName = userlist[i]["profile"]["first_name"]
             except:
+                #Find the user's username if they haven't set a name
                 userName = userlist[i]["name"]
             userNames.append(userName.lower())
-        for n in range(0, len(userIDs)):
-            #Find the DM channels for each user
-            openstring = str((sc.api_call("im.open", user=userIDs[n])))
-            searchObj = re.search(r'"id":"(.*?)"', openstring)
-            userchannel = searchObj.group(1)
-            userchannels.append(userchannel)
         return()
 
     def send(msgchannel, msgtext):
@@ -88,9 +89,8 @@ while True:
 
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
-        createlists()
         debug("Bot (unstable version) started.")
-        readfile()
+        createlists()
         crashTimes = []
         timesCrashed = 0
         #Bot only runs for 2.5 hours before restarting
@@ -103,7 +103,7 @@ while True:
                     #Find the status type
                     statustype = channelstatus[0]["type"]
                     if statustype:
-                        statustype = str(statustype)
+                        statustype = str(statustype).lower()
                         if statustype == "hello":
                             #Filter out hello message from server
                             print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Hello message received from server.")
@@ -121,6 +121,8 @@ while True:
                                     if userID in userIDs:
                                         userName = userNames[userIDs.index(userID)]
                                         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " is now " + presencestatus + ".")
+                                    else:
+                                        debug("User not found in list! Here are the details:\n" + str(channelstatus))
                                 elif statustype == "user_typing":
                                     #Handle typing
                                     if userID in userIDs:
@@ -137,11 +139,11 @@ while True:
                                         if userID in userIDs:
                                             #Find where the user is in the lists
                                             userpos = userIDs.index(userID)
-                                            #Find the user's name and channel
+                                            #Find the user's name
                                             userName = userNames[userpos]
                                             #Get the full text of the message
                                             message = channelstatus[0]['text']
-                                            message.strip()
+                                            message = message.strip()
                                             print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                             #Handle new ideas
                                             if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
@@ -156,6 +158,7 @@ while True:
                                                 (m, name) = message.split(" ", maxsplit = 1)
                                                 #Check if the user exists
                                                 if name.lower() in userNames:
+                                                    #Put all this in a function eventually maybe?
                                                     userpos = userNames.index(name.lower())
                                                     userID = userIDs[userpos]
                                                     #Grab the dictionary from the text file
@@ -218,7 +221,7 @@ while True:
                 #Handle unhandled exceptions
                 #Keep track of the number of exceptions
                 timesCrashed += 1
-                debug(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ")")
+                debug("Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ")")
                 #Create a list of exceptions, up to 10 
                 crashTimes.append(time.time())
                 if len(crashTimes) == 10:
@@ -226,8 +229,8 @@ while True:
                         crashTimes.pop(0)
                     else:
                         #Runs if there are > 10 crashes within one minute
+                        print("Too many unhandled exceptions! Shutting down...")
                         try:
-                            print("Too many unhandled exceptions! Shutting down...")
                             debug("Too many unhandled exceptions! Shutting down...")
                         except:
                             pass
@@ -235,3 +238,8 @@ while True:
                         sys.exit()
             time.sleep(1)
         debug("Bot running for over 2.5 hours. Restarting!")
+    else:
+        #Handle being offline
+        print("Pybot cannot connect to the internet. Please try again later.")
+        #Exit because this whole bot is in a while loop for some reason
+        sys.exit()
