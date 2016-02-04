@@ -2,20 +2,22 @@ import re, time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
 
-#Initialize the bot class
+#Initialize the bot class (useless for now)
 class Bot:
     def __init__(self, token):
         self.token = token
+        self.sc = SlackClient(token)
 
-    def post(msgtext, msgchannel):
-        sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
+    def send(msgtext, msgchannel):
+        self.sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
 
     def debug(msg):
         self.send("#pybotdebug", time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
 
+
 #TODO: Move bot into a class and fix all the things
 #TODO: Handle editing of messages
-#TODO: Have bot grab its own userID
+#TODO: Have bot ignore other bots
 
 while True:
     #No idea why this is here and not at the end
@@ -81,7 +83,7 @@ while True:
 
     def createlists():
         #Get the user list
-        #Removed str(), put it back if something happens
+        #Removed str(), might put it back if something happens
         userlist = loads(sc.api_call("users.list").decode("utf-8"))['members']
         #Parse for user IDs
         for i in range(0, len(userlist)):
