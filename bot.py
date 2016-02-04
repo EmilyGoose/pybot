@@ -2,16 +2,34 @@ import re, time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
 
-#Edit this stuff in the Sandbox build. This one is at least somewhat stable.
+#Initialize the bot class
+class Bot:
+    def __init__(self, token):
+        self.token = token
+
+    def post(msgtext, msgchannel):
+        sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
+
+    def debug(msg):
+        self.send("#pybotdebug", time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
+
+#TODO: Move bot into a class and fix all the things
+#TODO: Handle editing of messages
+#TODO: Have bot grab its own userID
 
 while True:
+    #No idea why this is here and not at the end
     importlib.reload(slackclient)
+    
     starttime = time.time()
+    
     print("Ready to connect to Slack.")
 
+    #Initialize token for API calls
     token = cfg.USTOKEN
     sc = SlackClient(token)
 
+    #Initialize empty lists
     userIDs = []
     userNames = []
 
