@@ -20,8 +20,8 @@ class Bot:
 #TODO: Have bot ignore other bots
 
 def logError(e):
+    #Log unhandled exceptions
     try:
-        #Open the file
         f = open("log.txt", 'a')
     except:
         f = open("log.txt", 'w')
@@ -31,8 +31,8 @@ def logError(e):
     f.close()
 
 def logStart():
+    #Log bot start
     try:
-        #Open the file
         f = open("log.txt", 'a')
     except:
         f = open("log.txt", 'w')
@@ -42,8 +42,8 @@ def logStart():
     f.close()
 
 def logRestart():
+    #Log bot restarts
     try:
-        #Open the file
         f = open("log.txt", 'a')
     except:
         f = open("log.txt", 'w')
@@ -53,8 +53,8 @@ def logRestart():
     f.close()
 
 def logShutdown():
+    #Log bot shutdowns caused by too many exceptions
     try:
-        #Open the file
         f = open("log.txt", 'a')
     except:
         f = open("log.txt", 'w')
