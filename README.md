@@ -32,7 +32,9 @@ Displays information about the machine running the bot
 
 ### New Features
 * Bot now waits 5 minutes when restarting
+* Error log
 
 ### Fixes
 * Cleaned up existing code
 * Killed useless code
+* Made error handling better
