@@ -114,3 +114,6 @@ cfg.py
 # Dictionary
 dict.txt
 usdict.txt
+
+# Crash log
+log.txt
