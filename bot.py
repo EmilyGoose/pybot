@@ -254,7 +254,8 @@ while True:
                         #Exit the program
                         sys.exit()
             time.sleep(1)
-        debug("Bot running for over 2.5 hours. Restarting!")
+        debug("Bot running for over 2.5 hours. Restarting in 5 minutes.")
+        wait(300)
     else:
         #Handle being offline
         print("Pybot cannot connect to the internet. Please try again later.")
