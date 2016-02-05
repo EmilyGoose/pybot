@@ -30,5 +30,9 @@ Displays information about the machine running the bot
 
 # New since v3.2.1
 
+### New Features
+* Bot now waits 5 minutes when restarting
+
+### Fixes
 * Cleaned up existing code
 * Killed useless code
