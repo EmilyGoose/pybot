@@ -38,3 +38,4 @@ Displays information about the machine running the bot
 * Cleaned up existing code
 * Killed useless code
 * Made error handling better
+* Bot no longer wipes text files when Zalgo text is input
