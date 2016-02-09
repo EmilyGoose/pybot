@@ -45,3 +45,4 @@ Note that you only need the USTOKEN variable if you will be running the unstable
 
 ### New Features
 * Channel for bot to listen/post is now configurable
+* Debug mode is optional and the debug channel is configurable

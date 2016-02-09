@@ -103,9 +103,20 @@ while True:
             chfound = True
             channel = chlist[i]["id"]
     if chfound == False:
-        print('Could not find a channel named "' + chname + '". Please check your configurations.')
+        print('Could not find a channel named #' + chname + '. Please check your configurations.')
         sys.exit()
-    print('Found channel "' + chname + '". (ID ' + channel + ')')
+    print('Found channel #' + chname + '. (ID ' + channel + ')')
+    if cfg.DEBUGMODE == True:
+        dbname = cfg.DEBUGCH
+        dbfound = False
+        for i in range(0, len(chlist)):
+            if chlist[i]["name"].strip() == dbname:
+                dbfound = True
+                debugchannel = chlist[i]["id"]
+        if dbfound == False:
+            print('Could not find a channel named #' + dbname + '. Please check your configurations.')
+            sys.exit()
+        print('Found debug channel #' + dbname + '. (ID ' + debugchannel + ')')
 
     #Initialize empty lists
     userIDs = []
@@ -182,7 +193,7 @@ while True:
         sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
 
     def debug(msg):
-        send("#pybotdebug", time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
+        send(debugchannel, time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
 
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
