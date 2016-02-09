@@ -117,6 +117,7 @@ while True:
 
     def newidea(name, text):
         #Grab the dictionary from the file
+        dprotect = readfile()
         d = readfile()
         try:
             #Add the idea to the user's list of ideas
@@ -125,6 +126,9 @@ while True:
             #Create the user in the dictionary if they don't exist
             d[name] = [text]
         writedict(d)
+        if readfile() == {}:
+            debug("Something wiped the file. Restoring to previous version...")
+            writedict(dprotect)
         return()
 
     def createlists():
@@ -212,11 +216,15 @@ while True:
                                                 #Handle new ideas
                                                 if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                                     (m, idea) = message.split(": ", maxsplit = 1)
+                                                    dprotect = readfile()
                                                     try:
-                                                        newidea(userID, idea)
-                                                        send("G0H17UA5S", userName.title() + "'s idea has been added.")
-                                                    except:
-                                                        send("G0H17UA5S", "Sorry, I couldn't add your idea. Please try again!")
+                                                        newidea(userID, idea)          
+                                                    except Exception as e:
+                                                        send("#ideas", "Sorry, I couldn't add your idea. Please try again!")
+                                                        writedict(dprotect)
+                                                        logError(e)
+                                                    else:
+                                                        send("#ideas", userName.title() + "'s idea has been added.")
                                                 #Handle !getideas calls
                                                 elif (message.lower()[:12] == "us!getideas ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
                                                     (m, name) = message.split(" ", maxsplit = 1)
@@ -303,10 +311,10 @@ while True:
                         sys.exit()
             time.sleep(1)
         debug("Bot running for over 2.5 hours. Restarting in 5 minutes.")
-        wait(300)
         logRestart()
+        wait(300)
     else:
         #Handle being offline
         print("Pybot cannot connect to the internet. Please try again later.")
-        #Exit because this whole bot is in a while loop for some reason
+        #Kill the bot because the whole thing is in a while loop for some reason
         sys.exit()
