@@ -1,3 +1,6 @@
+#Pybot (unstable version) by Misha Larionov
+#http://github.com/MishaLarionov/pybot
+
 import re, time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
@@ -329,3 +332,4 @@ while True:
         print("Pybot cannot connect to the internet. Please try again later.")
         #Kill the bot because the whole thing is in a while loop for some reason
         sys.exit()
+
