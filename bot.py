@@ -1,7 +1,8 @@
 #Pybot (unstable version) by Misha Larionov
 #http://github.com/MishaLarionov/pybot
 
-import re, time, cfg, ast, sys, importlib, slackclient, platform
+#Import ALL The libraries (plus configurations)
+import time, cfg, ast, sys, importlib, slackclient, platform
 from slackclient import SlackClient
 from json import loads
 
@@ -21,6 +22,8 @@ class Bot:
 #TODO: Move bot into a class and fix all the things
 #TODO: Handle editing of messages
 #TODO: Have bot ignore other bots
+
+#Initialize all error logging functions
 
 def logError(e):
     #Log unhandled exceptions
@@ -90,6 +93,19 @@ while True:
     #Initialize token for API calls
     token = cfg.USTOKEN
     sc = SlackClient(token)
+
+    #Initialize channel for posting
+    chname = (cfg.CHANNEL).lower().strip()
+    chlist = loads(sc.api_call("groups.list").decode("utf-8"))["groups"] + loads(sc.api_call("channels.list").decode("utf-8"))["channels"]
+    chfound = False
+    for i in range(0, len(chlist)):
+        if chlist[i]["name"].strip() == chname:
+            chfound = True
+            channel = chlist[i]["id"]
+    if chfound == False:
+        print('Could not find a channel named "' + chname + '". Please check your configurations.')
+        sys.exit()
+    print('Found channel "' + chname + '". (ID ' + channel + ')')
 
     #Initialize empty lists
     userIDs = []
@@ -228,19 +244,19 @@ while True:
                                                 message = message.strip()
                                                 print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                                 #Handle new ideas
-                                                if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                                if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == channel):
                                                     (m, idea) = message.split(": ", maxsplit = 1)
                                                     dprotect = readfile()
                                                     try:
                                                         newidea(userID, idea)          
                                                     except Exception as e:
-                                                        send("#ideas", "Sorry, I couldn't add your idea. Please try again!")
+                                                        send(channel, "Sorry, I couldn't add your idea. Please try again!")
                                                         writedict(dprotect)
                                                         logMiscError("Idea creation error", e)
                                                     else:
-                                                        send("#ideas", userName.title() + "'s idea has been added.")
+                                                        send(channel, userName.title() + "'s idea has been added.")
                                                 #Handle !getideas calls
-                                                elif (message.lower()[:12] == "us!getideas ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                                elif (message.lower()[:12] == "us!getideas ") and (channelstatus[0]['channel'] == channel):
                                                     (m, name) = message.split(" ", maxsplit = 1)
                                                     #Check if the user exists
                                                     if name.lower() in userNames:
@@ -257,15 +273,15 @@ while True:
                                                                 s = ("Ideas for " + name.lower().title() + ":")
                                                                 for i in range(0, len(d[userID])):
                                                                     s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
-                                                                send("G0H17UA5S", s)
+                                                                send(channel, s)
                                                             else:
-                                                                send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
+                                                                send(channel, name.lower().title() + " has not entered any ideas yet!")
                                                         else:
-                                                            send("G0H17UA5S", name.lower().title() + " has not entered any ideas yet!")
+                                                            send(channel, name.lower().title() + " has not entered any ideas yet!")
                                                     else:
-                                                        send("G0H17UA5S", "Name not found! Please try again!")
+                                                        send(channel, "Name not found! Please try again!")
                                                 #Handle idea deletion
-                                                elif (message.lower()[:11] == "us!delidea ") and (channelstatus[0]['channel'] == "G0H17UA5S"):
+                                                elif (message.lower()[:11] == "us!delidea ") and (channelstatus[0]['channel'] == channel):
                                                     (m, num) = message.split(" ",maxsplit = 1)
                                                     try:
                                                         #Makes sure "1" points to d[userID][0]
@@ -276,18 +292,18 @@ while True:
                                                         d = readfile()
                                                         #Make sure the number is not greater than the amount of elements
                                                         if (num + 1) > len(d[userID]):
-                                                            send("G0H17UA5S", "The number you entered is too large. Please try again.")
+                                                            send(channel, "The number you entered is too large. Please try again.")
                                                         else:
                                                             #Get rid of the element
                                                             e = d[userID].pop(num)
                                                             #Rebuild the dictionary
                                                             writedict(d)
-                                                            send("G0H17UA5S", "Idea `" + e.replace("`", "'") + "` deleted.")
+                                                            send(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
                                                     except:
-                                                        send("G0H17UA5S", "Invalid number. Please try again.")
+                                                        send(channel, "Invalid number. Please try again.")
                                                 #Steal server info
-                                                elif (message.lower()[:14] == "us!machineinfo") and (channelstatus[0]['channel'] == "G0H17UA5S"):  
-                                                    send("G0H17UA5S", platform.node() + ' '.join(platform.dist()))
+                                                elif (message.lower()[:14] == "us!machineinfo") and (channelstatus[0]['channel'] == channel):  
+                                                    send(channel, platform.node() + ' '.join(platform.dist()))
                                             else:
                                                 debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                                     elif statustype == "reaction_added" or statustype == "reaction_removed":
@@ -329,7 +345,7 @@ while True:
         wait(300)
     else:
         #Handle being offline
-        print("Pybot cannot connect to the internet. Please try again later.")
+        print("Pybot cannot connect to Slack. Please check your configurations try again later.")
         #Kill the bot because the whole thing is in a while loop for some reason
         sys.exit()
 
