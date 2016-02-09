@@ -28,7 +28,7 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 Displays information about the machine running the bot
 
-# New in v3.3
+# New since v3.2.1
 
 ### New Features
 * Bot now waits 5 minutes when restarting
