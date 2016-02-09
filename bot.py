@@ -30,6 +30,17 @@ def logError(e):
     f.write("Unhandled exception occurred on " + time.strftime("%Y-%m-%d %H:%M:%S") + ":\n" + str(e) + "\n-----\n")
     f.close()
 
+def logMiscError(t,e):
+    #Log unhandled exceptions
+    try:
+        f = open("log.txt", 'a')
+    except:
+        f = open("log.txt", 'w')
+        f.close()
+        f = open("log.txt", 'a')
+    f.write(str(t) + " occurred on " + time.strftime("%Y-%m-%d %H:%M:%S") + ":\n" + str(e) + "\n-----\n")
+    f.close()
+
 def logStart():
     #Log bot start
     try:
@@ -222,7 +233,7 @@ while True:
                                                     except Exception as e:
                                                         send("#ideas", "Sorry, I couldn't add your idea. Please try again!")
                                                         writedict(dprotect)
-                                                        logError(e)
+                                                        logMiscError("Idea creation error", e)
                                                     else:
                                                         send("#ideas", userName.title() + "'s idea has been added.")
                                                 #Handle !getideas calls
