@@ -326,7 +326,7 @@ while True:
             time.sleep(1)
         debug("Bot running for over 2.5 hours. Restarting in 5 minutes.")
         logRestart()
-        wait(300)
+        time.sleep(300)
     else:
         #Handle being offline
         print("Pybot cannot connect to the internet. Please try again later.")
