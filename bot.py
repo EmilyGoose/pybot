@@ -106,14 +106,12 @@ while True:
         print('Could not find a channel named #' + chname + '. Please check your configurations.')
         sys.exit()
     print('Found channel #' + chname + '. (ID ' + channel + ')')
-    debugmode = False
     if cfg.DEBUGMODE == True:
         dbname = cfg.DEBUGCH
         dbfound = False
         for i in range(0, len(chlist)):
             if chlist[i]["name"].strip() == dbname:
                 dbfound = True
-                debugmode = True
                 debugchannel = chlist[i]["id"]
         if dbfound == False:
             print('Could not find a channel named #' + dbname + '. Please check your configurations.')
@@ -195,7 +193,7 @@ while True:
         sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
 
     def debug(msg):
-        if debugmode == True:
+        if cfg.DEBUGMODE == True:
             send(debugchannel, time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
 
     if sc.rtm_connect():
@@ -327,6 +325,8 @@ while True:
                                         #Rebuild userlist if someone changes their name
                                         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": A user changed their profile info.")
                                         createlists()
+                                    elif statustype == "reconnect_url":
+                                        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": It's recconect_url again.")
                                     else:
                                         debug("Unimplemented status! Here are the details:\n" + str(channelstatus))
                                 else:
