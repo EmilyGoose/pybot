@@ -317,7 +317,7 @@ while True:
                                                     send(channel, platform.node() + ' '.join(platform.dist()))
                                                 #Uptime
                                                 elif (message.lower()[:9] == "us!uptime") and (channelstatus[0]['channel'] == channel):
-                                                    send(channel, ("This instance of Pybot has been running for: " + time.strftime('%H:%M:%S', time.gmtime(time.time()-firststart))))  
+                                                    send(channel, ("This instance of Pybot has been running for: " + time.strftime('%Hh%Mm%Ss', time.gmtime(time.time()-firststart))))  
                                             else:
                                                 debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                                     elif statustype == "reaction_added" or statustype == "reaction_removed":
