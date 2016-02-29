@@ -82,10 +82,9 @@ def logShutdown():
 
 logStart()
 
+firststart = time.time()
+
 while True:
-    #No idea why this is here and not at the end
-    importlib.reload(slackclient)
-    
     starttime = time.time()
     
     print("Ready to connect to Slack.")
@@ -316,6 +315,9 @@ while True:
                                                 #Steal server info
                                                 elif (message.lower()[:14] == "us!machineinfo") and (channelstatus[0]['channel'] == channel):  
                                                     send(channel, platform.node() + ' '.join(platform.dist()))
+                                                #Uptime
+                                                elif (message.lower()[:9] == "us!uptime") and (channelstatus[0]['channel'] == channel):
+                                                    send(channel, ("This instance of Pybot has been running for: " + time.strftime('%H:%M:%S', time.gmtime(time.time()-firststart))))  
                                             else:
                                                 debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
                                     elif statustype == "reaction_added" or statustype == "reaction_removed":
@@ -356,6 +358,8 @@ while True:
             time.sleep(1)
         debug("Bot running for over 2.5 hours. Restarting in 5 minutes.")
         logRestart()
+        #Reload the slackclient library
+        importlib.reload(slackclient)
         time.sleep(300)
     else:
         #Handle being offline
