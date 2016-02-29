@@ -1,4 +1,4 @@
-#Pybot (v3.3) by Misha Larionov
+#Pybot (v3.3.1) by Misha Larionov
 #http://github.com/MishaLarionov/pybot
 
 import re, time, cfg, ast, sys, importlib, slackclient, platform
@@ -170,7 +170,7 @@ while True:
 
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
-        debug("Pybot (v3.3) started.")
+        debug("Pybot (v3.3.1) started.")
         createlists()
         crashTimes = []
         timesCrashed = 0
