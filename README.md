@@ -26,6 +26,10 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 Displays information about the machine running the bot
 
+### !uptime
+
+Displays information about how long the bot instance has been running
+
 # Setup instructions
 
 Place bot.py in whichever folder you want it to run in. Note that it creates multiple text files, so putting it in a folder would be recommended.
@@ -43,6 +47,13 @@ Note that you only need the USTOKEN variable if you will be running the unstable
 
 # New since v3.3
 
+### Commands
+* !uptime (see above)
+
 ### New Features
 * Channel for bot to listen/post is now configurable
 * Debug mode is optional and the debug channel is configurable
+
+### Fixes
+* Less hardcoding
+* Some shuffling around of code
