@@ -45,7 +45,7 @@ DEBUGCH = "pybotdebug"
 
 Note that you only need the USTOKEN variable if you will be running the unstable build. If DEBUGMODE is set to False, you do not need to set DEBUGCH
 
-# New in v4.0
+# New since v3.3
 
 ### Commands
 * !uptime (see above)
