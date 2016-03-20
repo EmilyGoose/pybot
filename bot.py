@@ -90,7 +90,7 @@ while True:
     print("Ready to connect to Slack.")
 
     #Initialize token for API calls
-    token = cfg.TOKEN
+    token = cfg.USTOKEN
     sc = SlackClient(token)
 
     #Initialize channel for posting
@@ -197,7 +197,7 @@ while True:
 
     if sc.rtm_connect():
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
-        debug("Bot (v4.0) started.")
+        debug("Bot (unstable version) started.")
         createlists()
         crashTimes = []
         timesCrashed = 0
@@ -255,7 +255,7 @@ while True:
                                                 message = message.strip()
                                                 print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
                                                 #Handle new ideas
-                                                if (message.lower()[:7] == "!idea: ") and (channelstatus[0]['channel'] == channel):
+                                                if (message.lower()[:9] == "us!idea: ") and (channelstatus[0]['channel'] == channel):
                                                     (m, idea) = message.split(": ", maxsplit = 1)
                                                     dprotect = readfile()
                                                     try:
@@ -267,7 +267,7 @@ while True:
                                                     else:
                                                         send(channel, userName.title() + "'s idea has been added.")
                                                 #Handle !getideas calls
-                                                elif (message.lower()[:10] == "!getideas ") and (channelstatus[0]['channel'] == channel):
+                                                elif (message.lower()[:12] == "us!getideas ") and (channelstatus[0]['channel'] == channel):
                                                     (m, name) = message.split(" ", maxsplit = 1)
                                                     #Check if the user exists
                                                     if name.lower() in userNames:
@@ -292,7 +292,7 @@ while True:
                                                     else:
                                                         send(channel, "Name not found! Please try again!")
                                                 #Handle idea deletion
-                                                elif (message.lower()[:9] == "!delidea ") and (channelstatus[0]['channel'] == channel):
+                                                elif (message.lower()[:11] == "us!delidea ") and (channelstatus[0]['channel'] == channel):
                                                     (m, num) = message.split(" ",maxsplit = 1)
                                                     try:
                                                         #Makes sure "1" points to d[userID][0]
@@ -313,10 +313,10 @@ while True:
                                                     except:
                                                         send(channel, "Invalid number. Please try again.")
                                                 #Steal server info
-                                                elif (message.lower()[:12] == "!machineinfo") and (channelstatus[0]['channel'] == channel):  
+                                                elif (message.lower()[:14] == "us!machineinfo") and (channelstatus[0]['channel'] == channel):  
                                                     send(channel, platform.node() + ' '.join(platform.dist()))
                                                 #Uptime
-                                                elif (message.lower()[:7] == "!uptime") and (channelstatus[0]['channel'] == channel):
+                                                elif (message.lower()[:9] == "us!uptime") and (channelstatus[0]['channel'] == channel):
                                                     send(channel, ("This instance of Pybot has been running for: " + time.strftime('%Hh%Mm%Ss', time.gmtime(time.time()-firststart))))  
                                             else:
                                                 debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
