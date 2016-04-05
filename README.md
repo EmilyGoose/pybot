@@ -3,9 +3,7 @@ Bot for Slack built in Python
 
 This is a side project of mine, which hopefully will make it easy to keep track of ideas my team has for upcoming hackathons.
 Feel free to use my code, but please credit me (preferably via direct link to this repo). I try to comment it where possible.
-If you would like to make a pull request, please make it to "usbot.py". "bot.py" is my stable build.
-
-If you want to add it to your own Slack channel, create cfg.py and set TOKEN to be a string of your bot's token. You might have to change some of the userIDs in the main code, I'll get around to making that easier someday.
+If you would like to make a pull request, please make it to the "unstable" branch. The master branch is my stable build.
 
 # Usage
 
@@ -28,14 +26,34 @@ Deletes the *n*th idea in your list of ideas. It is reccommended to call !getide
 
 Displays information about the machine running the bot
 
-# New in v3.3
+### !uptime
+
+Displays information about how long the bot instance has been running
+
+# Setup instructions
+
+Place bot.py in whichever folder you want it to run in. Note that it creates multiple text files, so putting it in a folder would be recommended.
+Create a file named "cfg.py" in the same folder. The file should look like this:
+
+```Python
+TOKEN = "<redacted>"
+USTOKEN = "<redacted>"
+CHANNEL = "ideas"
+DEBUGMODE = True
+DEBUGCH = "pybotdebug"
+```
+
+Note that you only need the USTOKEN variable if you will be running the unstable build. If DEBUGMODE is set to False, you do not need to set DEBUGCH
+
+# New since v3.3
+
+### Commands
+* !uptime (see above)
 
 ### New Features
-* Bot now waits 5 minutes when restarting
-* Error log
+* Channel for bot to listen/post is now configurable
+* Debug mode is optional and the debug channel is configurable
 
 ### Fixes
-* Cleaned up existing code
-* Killed useless code
-* Made error handling better
-* Bot no longer wipes text files when Zalgo text is input
+* Less hardcoding
+* Some shuffling around of code
