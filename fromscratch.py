@@ -1,16 +1,21 @@
-import discord, cfg, time
+import discord, cfg, time, platform
 
 client = discord.Client()
 debug = None
 members = []
 client.login(cfg.EMAIL, cfg.PASSWORD)
+debug = client.get_channel(cfg.DEBUGCH)
 
-def createLists():
+def createLists(client):
+    print("lists have been created")
+    userNames = []
+    userIDs = []
     for server in client.servers:
         for member in server.members:
             yield member
             userNames.append(member.name.lower())
             userIDs.append(member.id)
+    return {0: userNames, 1: userIDs}
 
 def logError(e):
     #Log unhandled exceptions
@@ -66,6 +71,8 @@ def writedict(d):
     return()
 
 def newidea(name, text):
+    debug = client.get_channel(cfg.DEBUGCH)
+    print(debug)
     #Grab the dictionary from the file
     dprotect = readfile()
     d = readfile()
@@ -83,6 +90,7 @@ def newidea(name, text):
 
 @client.event
 def on_message(message):
+    debug = client.get_channel(cfg.DEBUGCH)
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)
     # we do not want the bot to reply to itself
     if message.author == client.user:
@@ -104,6 +112,12 @@ def on_message(message):
             client.send_message(message.channel, "{}'s idea has been added.".format(message.author.mention()))
     #Handle !getideas calls
     elif message.content.startswith("!getideas "):
+        userNames = []
+        userIDs = []
+        for server in client.servers:
+            for member in server.members:
+                userNames.append(member.name.lower())
+                userIDs.append(member.id)
         (m, name) = message.content.split(" ", maxsplit = 1)
         #Check if the user exists
         if name.lower() in userNames:
@@ -147,7 +161,7 @@ def on_message(message):
                 writedict(d)
                 client.send_message(message.channel, "Idea `" + e.replace("`", "'") + "` deleted.")
         except:
-            client.send(message.channel, "Invalid number. Please try again.")
+            client.send_message(message.channel, "Invalid number. Please try again.")
     #Steal server info
     elif message.content.startswith("!machineinfo"):  
         client.send_message(message.channel, platform.node() + ' '.join(platform.dist()))
@@ -157,12 +171,15 @@ def on_message(message):
 
 @client.event
 def on_ready():
+    debug = client.get_channel(cfg.DEBUGCH)
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected as')
     print(client.user.name)
     print(client.user.id)
     print('------')
-    debug = client.get_channel(cfg.DEBUGCH)
     client.send_message(debug, "Bot started")
 
+
+
+print("started")
 client.run()
 createLists()
