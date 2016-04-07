@@ -83,7 +83,7 @@ def newidea(name, text):
 
 @client.event
 def on_message(message):
-    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message)
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)
     # we do not want the bot to reply to itself
     if message.author == client.user:
         return
