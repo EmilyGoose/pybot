@@ -1,370 +1,155 @@
-#Pybot (unstable version) by Misha Larionov
-#http://github.com/MishaLarionov/pybot
+import discord, cfg, time, platform, ast, sched, sys
+#import dateparser
 
-#Import ALL The libraries (plus configurations)
-import time, cfg, ast, sys, importlib, slackclient, platform
-from slackclient import SlackClient
-from json import loads
+client = discord.Client()
+client.login(cfg.EMAIL, cfg.PASSWORD)
+debug = client.get_channel(cfg.DEBUGCH)
 
-#Initialize the bot class (useless for now)
-class Bot:
-    def __init__(self, token):
-        self.token = token
-        self.sc = SlackClient(token)
-
-    def send(msgtext, msgchannel):
-        self.sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
-
-    def debug(msg):
-        self.send("#pybotdebug", time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
-
-
-#TODO: Move bot into a class and fix all the things
-#TODO: Handle editing of messages
-#TODO: Have bot ignore other bots
-
-#Initialize all error logging functions
-
-def logError(e):
-    #Log unhandled exceptions
+def readfile():
+    d = {}
     try:
-        f = open("log.txt", 'a')
+        #Open the file
+        with open("dict.txt", 'r') as f:
+            for line in f:
+                #Grab the keys and values
+                (key, val) = line.split("|", maxsplit = 1)
+                #Rebuild the dictionary
+                #Literally no clue how this line works
+                d[key] = ast.literal_eval(val)
     except:
-        f = open("log.txt", 'w')
-        f.close()
-        f = open("log.txt", 'a')
-    f.write("Unhandled exception occurred on " + time.strftime("%Y-%m-%d %H:%M:%S") + ":\n" + str(e) + "\n-----\n")
-    f.close()
-
-def logMiscError(t,e):
-    #Log unhandled exceptions
-    try:
-        f = open("log.txt", 'a')
-    except:
-        f = open("log.txt", 'w')
-        f.close()
-        f = open("log.txt", 'a')
-    f.write(str(t) + " occurred on " + time.strftime("%Y-%m-%d %H:%M:%S") + ":\n" + str(e) + "\n-----\n")
-    f.close()
-
-def logStart():
-    #Log bot start
-    try:
-        f = open("log.txt", 'a')
-    except:
-        f = open("log.txt", 'w')
-        f.close()
-        f = open("log.txt", 'a')
-    f.write("Bot started on " + time.strftime("%Y-%m-%d %H:%M:%S") + "\n-----\n")
-    f.close()
-
-def logRestart():
-    #Log bot restarts
-    try:
-        f = open("log.txt", 'a')
-    except:
-        f = open("log.txt", 'w')
-        f.close()
-        f = open("log.txt", 'a')
-    f.write("Bot restarted on " + time.strftime("%Y-%m-%d %H:%M:%S") + "\n-----\n")
-    f.close()
-
-def logShutdown():
-    #Log bot shutdowns caused by too many exceptions
-    try:
-        f = open("log.txt", 'a')
-    except:
-        f = open("log.txt", 'w')
-        f.close()
-        f = open("log.txt", 'a')
-    f.write("Bot shut down on " + time.strftime("%Y-%m-%d %H:%M:%S") + " due to too many unhandled exceptions.\n-----\n")
-    f.close()
-
-logStart()
-
-firststart = time.time()
-
-while True:
-    starttime = time.time()
-    
-    print("Ready to connect to Slack.")
-
-    #Initialize token for API calls
-    token = cfg.TOKEN
-    sc = SlackClient(token)
-
-    #Initialize channel for posting
-    chname = (cfg.CHANNEL).lower().strip()
-    chlist = loads(sc.api_call("groups.list").decode("utf-8"))["groups"] + loads(sc.api_call("channels.list").decode("utf-8"))["channels"]
-    chfound = False
-    for i in range(0, len(chlist)):
-        if chlist[i]["name"].strip() == chname:
-            chfound = True
-            channel = chlist[i]["id"]
-    if chfound == False:
-        print('Could not find a channel named #' + chname + '. Please check your configurations.')
-        sys.exit()
-    print('Found channel #' + chname + '. (ID ' + channel + ')')
-    if cfg.DEBUGMODE == True:
-        dbname = cfg.DEBUGCH
-        dbfound = False
-        for i in range(0, len(chlist)):
-            if chlist[i]["name"].strip() == dbname:
-                dbfound = True
-                debugchannel = chlist[i]["id"]
-        if dbfound == False:
-            print('Could not find a channel named #' + dbname + '. Please check your configurations.')
-            sys.exit()
-        print('Found debug channel #' + dbname + '. (ID ' + debugchannel + ')')
-
-    #Initialize empty lists
-    userIDs = []
-    userNames = []
-
-    def readfile():
-        #Initialize placeholder empty dictionary
-        d = {}
-        try:
-            #Open the file
-            with open("dict.txt", 'r') as f:
-                #Iterate through the lines
-                for line in f:
-                    #Grab the keys and values
-                    (key, val) = line.split("|", maxsplit = 1)
-                    #Rebuild the dictionary
-                    #Literally no clue how this line works
-                    d[key] = ast.literal_eval(val)
-        except:
-            #Create a new file if dict.txt doesn't exist
-            #Or if an error happens. I'll fix that later.
-            f = open("dict.txt", 'w')
-        f.close()
-        return(d)
-    
-    def writedict(d):
-        #Create placeholder empty string
-        s = ""
-        #Get the keys to match them with index numbers
-        keys = list(d.keys())
-        for i in range(0, len(d)):
-            #Write each line of the file with the proper syntax
-            s = (s + keys[i] + "|" + str(d[keys[i]]) + "\n")
+        #Create a new file if dict.txt doesn't exist
+        #Or if an error happens. I'll fix that later.
         f = open("dict.txt", 'w')
-        #Overwrite the file with the new content
-        f.write(s)
-        f.close()
-        return()
+    f.close()
+    return(d)
 
-    def newidea(name, text):
-        #Grab the dictionary from the file
+def writedict(d):
+    s = ""
+    #Get the keys to match them with index numbers
+    keys = list(d.keys())
+    for i in range(0, len(d)):
+        #Write each line of the file with the proper syntax
+        s = (s + keys[i] + "|" + str(d[keys[i]]) + "\n")
+    f = open("dict.txt", 'w')
+    #Overwrite the file with the new content
+    f.write(s)
+    f.close()
+    return()
+
+def newidea(name, text):
+    debug = client.get_channel(cfg.DEBUGCH)
+    #Grab the dictionary from the file
+    dprotect = readfile()
+    d = readfile()
+    try:
+        #Add the idea to the user's list of ideas
+        d[name].append(text)
+    except:
+        #Create the user in the dictionary if they don't exist
+        d[name] = [text]
+    writedict(d)
+    if readfile() == {}:
+        client.send_message(debug, "Something wiped the file. Restoring to previous version...")
+        writedict(dprotect)
+    return()
+
+def remind(name, channel):
+    client.send_message(channel, "You asked me to remind you to" + name)
+
+@client.event
+def on_message(message):
+    debug = client.get_channel(cfg.DEBUGCH)
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)
+    # we do not want the bot to reply to itself
+    if message.author == client.user:
+        return
+
+    if message.content.startswith('!hello'):
+        client.send_message(message.channel, 'Hello {}!'.format(message.author.mention()))
+    #Handle new ideas
+    if message.content.startswith('!idea:'):
+        (m, idea) = message.content.split(": ", maxsplit = 1)
         dprotect = readfile()
-        d = readfile()
         try:
-            #Add the idea to the user's list of ideas
-            d[name].append(text)
-        except:
-            #Create the user in the dictionary if they don't exist
-            d[name] = [text]
-        writedict(d)
-        if readfile() == {}:
-            debug("Something wiped the file. Restoring to previous version...")
+            newidea(message.author.id, idea)          
+        except Exception as e:
+            client.send_message(message.channel, "Sorry, I couldn't add your idea. Please try again!")
             writedict(dprotect)
-        return()
-
-    def createlists():
-        #Get the user list
-        #Removed str(), might put it back if something happens
-        userlist = loads(sc.api_call("users.list").decode("utf-8"))['members']
-        #Parse for user IDs
-        for i in range(0, len(userlist)):
-            userID = userlist[i]["id"]
-            userIDs.append(userID)
-            #Find the user's name
-            try:
-                userName = userlist[i]["profile"]["first_name"]
-            except:
-                #Find the user's username if they haven't set a name
-                userName = userlist[i]["name"]
-            userNames.append(userName.lower())
-        return()
-
-    def send(msgchannel, msgtext):
-        sc.api_call("chat.postMessage", as_user="true:", channel=msgchannel, text=msgtext)
-
-    def debug(msg):
-        if cfg.DEBUGMODE == True:
-            send(debugchannel, time.strftime("%Y-%m-%d %H:%M:%S") + ": " + msg)
-
-    if sc.rtm_connect():
-        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Connected to Slack.")
-        debug("Bot (v4.0) started.")
-        createlists()
-        crashTimes = []
-        timesCrashed = 0
-        #Bot only runs for 2.5 hours before restarting
-        while time.time() - starttime < 9000:
-            try:
-                #Get new information from the channel
-                channelstatus = sc.rtm_read()
-                if (channelstatus != []):
-                    #Do literally everything
-                    #Find the status type
-                    statustype = channelstatus[0]["type"]
-                    if statustype:
-                        statustype = str(statustype).lower()
-                        if statustype == "hello":
-                            #Filter out hello message from server
-                            print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Hello message received from server.")
-                        else:
-                            #Find the user ID of the active user
-                            try:
-                                userID = channelstatus[0]["user"]
-                            except:
-                                debug("Unknown status! Here are the details:\n" + str(channelstatus))
-                            else:
-                                if not (userID == "U0H16CK8T" or userID == "USLACKBOT"):
-                                    #Only run if the user is not pybot or Slackbot
-                                    if statustype == "presence_change":
-                                        #Handle presence changes
-                                        presencestatus = channelstatus[0]["presence"]
-                                        if userID in userIDs:
-                                            userName = userNames[userIDs.index(userID)]
-                                            print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " is now " + presencestatus + ".")
-                                        else:
-                                            debug("User not found in list! Here are the details:\n" + str(channelstatus))
-                                    elif statustype == "user_typing":
-                                        #Handle typing
-                                        if userID in userIDs:
-                                            userName = userNames[userIDs.index(userID)]
-                                            print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName + " is typing.")
-                                        else:
-                                            debug("User not found in list! Here are the details:\n" + str(channelstatus))
-                                    elif statustype == "message":
-                                        try:
-                                            #Filter out 'messages' with a subtype
-                                            #(Gets rid of bots)(should do edit as well)
-                                            subtype = channelstatus[0]['subtype']
-                                        except:
-                                            if userID in userIDs:
-                                                #Find where the user is in the lists
-                                                userpos = userIDs.index(userID)
-                                                #Find the user's name
-                                                userName = userNames[userpos]
-                                                #Get the full text of the message
-                                                message = channelstatus[0]['text']
-                                                message = message.strip()
-                                                print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + userName.title() + " says: " + message)
-                                                #Handle new ideas
-                                                if (message.lower()[:7] == "!idea: ") and (channelstatus[0]['channel'] == channel):
-                                                    (m, idea) = message.split(": ", maxsplit = 1)
-                                                    dprotect = readfile()
-                                                    try:
-                                                        newidea(userID, idea)          
-                                                    except Exception as e:
-                                                        send(channel, "Sorry, I couldn't add your idea. Please try again!")
-                                                        writedict(dprotect)
-                                                        logMiscError("Idea creation error", e)
-                                                    else:
-                                                        send(channel, userName.title() + "'s idea has been added.")
-                                                #Handle !getideas calls
-                                                elif (message.lower()[:10] == "!getideas ") and (channelstatus[0]['channel'] == channel):
-                                                    (m, name) = message.split(" ", maxsplit = 1)
-                                                    #Check if the user exists
-                                                    if name.lower() in userNames:
-                                                        #Put all this in a function eventually maybe?
-                                                        userpos = userNames.index(name.lower())
-                                                        userID = userIDs[userpos]
-                                                        #Grab the dictionary from the text file
-                                                        d = readfile()
-                                                        #Check if the user is in the idea dictionary
-                                                        if userID in d:
-                                                            #Check if the user has any ideas
-                                                            if len(d[userID]) > 0:
-                                                                #Output a numbered list of the user's ideas
-                                                                s = ("Ideas for " + name.lower().title() + ":")
-                                                                for i in range(0, len(d[userID])):
-                                                                    s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
-                                                                send(channel, s)
-                                                            else:
-                                                                send(channel, name.lower().title() + " has not entered any ideas yet!")
-                                                        else:
-                                                            send(channel, name.lower().title() + " has not entered any ideas yet!")
-                                                    else:
-                                                        send(channel, "Name not found! Please try again!")
-                                                #Handle idea deletion
-                                                elif (message.lower()[:9] == "!delidea ") and (channelstatus[0]['channel'] == channel):
-                                                    (m, num) = message.split(" ",maxsplit = 1)
-                                                    try:
-                                                        #Makes sure "1" points to d[userID][0]
-                                                        num = int(num) - 1
-                                                        if num < 0:
-                                                            num = num + 1
-                                                        #Grab the dictionary from the text file
-                                                        d = readfile()
-                                                        #Make sure the number is not greater than the amount of elements
-                                                        if (num + 1) > len(d[userID]):
-                                                            send(channel, "The number you entered is too large. Please try again.")
-                                                        else:
-                                                            #Get rid of the element
-                                                            e = d[userID].pop(num)
-                                                            #Rebuild the dictionary
-                                                            writedict(d)
-                                                            send(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
-                                                    except:
-                                                        send(channel, "Invalid number. Please try again.")
-                                                #Steal server info
-                                                elif (message.lower()[:12] == "!machineinfo") and (channelstatus[0]['channel'] == channel):  
-                                                    send(channel, platform.node() + ' '.join(platform.dist()))
-                                                #Uptime
-                                                elif (message.lower()[:7] == "!uptime") and (channelstatus[0]['channel'] == channel):
-                                                    send(channel, ("This instance of Pybot has been running for: " + time.strftime('%Hh%Mm%Ss', time.gmtime(time.time()-firststart))))  
-                                            else:
-                                                debug("User not found in list! Here are the details:\n" + str(channelstatus) + "\nNote: User may have joined between bot restarts. Problem will be fixed next time bot restarts.")
-                                    elif statustype == "reaction_added" or statustype == "reaction_removed":
-                                        #Handle reactions and whatnot
-                                        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Reaction added/removed somewhere. Too lazy to figure out where.")
-                                    elif statustype == "user_change":
-                                        #Rebuild userlist if someone changes their name
-                                        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": A user changed their profile info.")
-                                        createlists()
-                                    elif statustype == "reconnect_url":
-                                        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": It's recconect_url again.")
-                                    else:
-                                        debug("Unimplemented status! Here are the details:\n" + str(channelstatus))
-                                else:
-                                    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Pybot and/or Slackbot did something.")
-                    else:
-                        debug("This error should never happen. Here are the details:\n" + str(channelstatus))
-            except Exception as e:
-                #Handle unhandled exceptions
-                #Keep track of the number of exceptions
-                timesCrashed += 1
-                debug("Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ", see log.txt for more info)")
-                print(time.strftime("%Y-%m-%d %H:%M:%S") + ": Unhandled exception encountered. Restarting! (Exception #" + str(timesCrashed) + ", see log.txt for more info)")
-                logError(e)
-                #Create a list of exceptions, up to 10 
-                crashTimes.append(time.time())
-                if len(crashTimes) == 10:
-                    if (crashTimes[9] - crashTimes[0]) > 60:
-                        crashTimes.pop(0)
-                    else:
-                        try:
-                            debug("Too many unhandled exceptions! Shutting down...")
-                            logShutdown()
-                        except:
-                            pass
-                        #Exit the program
-                        sys.exit()
-            time.sleep(1)
-        debug("Bot running for over 2.5 hours. Restarting in 5 minutes.")
-        logRestart()
-        #Reload the slackclient library
-        importlib.reload(slackclient)
-        time.sleep(300)
-    else:
-        #Handle being offline
-        print("Pybot cannot connect to Slack. Please check your configurations try again later.")
-        #Kill the bot because the whole thing is in a while loop for some reason
+        else:
+            client.send_message(message.channel, "{}'s idea has been added.".format(message.author.mention()))
+    #Handle !getideas calls
+    elif message.content.startswith("!getideas "):
+        userNames = []
+        userIDs = []
+        for server in client.servers:
+            for member in server.members:
+                userNames.append(member.name.lower())
+                userIDs.append(member.id)
+        (m, name) = message.content.split(" ", maxsplit = 1)
+        #Check if the user exists
+        if name.lower() in userNames:
+            #Put all this in a function eventually maybe?
+            userpos = userNames.index(name.lower())
+            userID = userIDs[userpos]
+            #Grab the dictionary from the text file
+            d = readfile()
+            #Check if the user is in the idea dictionary
+            if userID in d:
+                #Check if the user has any ideas
+                if len(d[userID]) > 0:
+                    #Output a numbered list of the user's ideas
+                    s = ("Ideas for " + name.title() + ":")
+                    for i in range(0, len(d[userID])):
+                        s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
+                    client.send_message(message.channel, s)
+                else:
+                    client.send_message(message.channel, name.title() + " has not entered any ideas yet!")
+            else:
+                client.send_message(message.channel, name.title() + " has not entered any ideas yet!")
+        else:
+            client.send_message(message.channel, "Name not found! Please try again!")
+    #Handle idea deletion
+    elif message.content.startswith("!delidea "):
+        (m, num) = message.content.split(" ", maxsplit = 1)
+        try:
+            #Makes sure "1" points to d[userID][0]
+            num = int(num) - 1
+            if num < 0:
+                num = num + 1
+            #Grab the dictionary from the text file
+            d = readfile()
+            #Make sure the number is not greater than the amount of elements
+            if (num + 1) > len(d[message.author.id]):
+                client.send_message(message.channel, "The number you entered is too large. Please try again.")
+            else:
+                #Get rid of the element
+                e = d[message.author.id].pop(num)
+                #Rebuild the dictionary
+                writedict(d)
+                client.send_message(message.channel, "Idea `" + e.replace("`", "'") + "` deleted.")
+        except:
+            client.send_message(message.channel, "Invalid number. Please try again.")
+    #Steal server info
+    elif message.content.startswith("!machineinfo"):  
+        client.send_message(message.channel, platform.node() + " " + platform.platform())
+    #Reminders (currently disabled)
+    elif message.content.startswith("!remind") and False:
+        event = message.content.split(" ", maxsplit = 1)[1]
+        (name, datetime) = event.split("@", maxsplit = 1)
+        name = name.strip()
+        dtime = dateparser.parse(datetime)
+        s = sched.scheduler()
+        s.enterabs(dtime.timestamp(), 1, (remind, message.channel), name)
+        s.run()
+    elif message.content.startswith("!killswitch"):
         sys.exit()
+    elif message.content.startswith("!help"):
+        client.send_message(message.channel, "pybot v5 help\n`!help` shows this page\n`!idea: Put an idea here` Records a suggestion in your name. You can see it with !getideas username\n`!getideas username` lists ideas from user\n`!delidea *number*` deletes the idea with the number supplied\n`!machineinfo` Returns server name and operating system")
+@client.event
+def on_ready():
+    debug = client.get_channel(cfg.DEBUGCH)
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected')
+    client.send_message(debug, "Bot started")
 
-
+client.run()
+createLists()
