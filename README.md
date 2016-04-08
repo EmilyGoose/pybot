@@ -1,9 +1,9 @@
 # Pybot
-Bot for Slack built in Python
+Bot for Discord built in Python
 
 This is a side project of mine, which hopefully will make it easy to keep track of ideas my team has for upcoming hackathons.
-Feel free to use my code, but please credit me (preferably via direct link to this repo). I try to comment it where possible.
-If you would like to make a pull request, please make it to the "unstable" branch. The master branch is my stable build.
+Feel free to use the code, but please credit me (preferably via direct link to this repo). I try to comment it where possible.
+This is still very unstable, so if you would like to make a pull request, please just submit an issue. The master branch is the version built for Slack.
 
 # Usage
 
@@ -20,15 +20,15 @@ Make sure there is a space between the command and the person's name.
 
 ### !delidea \<*n*\>
 
-Deletes the *n*th idea in your list of ideas. It is reccommended to call !getideas first.
+Deletes the *n*th idea in your list of ideas. It is recommended to call !getideas first.
 
 ### !machineinfo
 
 Displays information about the machine running the bot
 
-### !uptime
+### !help
 
-Displays information about how long the bot instance has been running
+Displays version info and a list of commands
 
 # Setup instructions
 
@@ -36,24 +36,19 @@ Place bot.py in whichever folder you want it to run in. Note that it creates mul
 Create a file named "cfg.py" in the same folder. The file should look like this:
 
 ```Python
-TOKEN = "<redacted>"
-USTOKEN = "<redacted>"
-CHANNEL = "ideas"
+EMAIL = "<redacted>"
+PASSWORD = "<redacted>"
 DEBUGMODE = True
-DEBUGCH = "pybotdebug"
+DEBUGCH = "<channel id>"
 ```
 
-Note that you only need the USTOKEN variable if you will be running the unstable build. If DEBUGMODE is set to False, you do not need to set DEBUGCH
-
-# New in v4.0
+# New in v5.0
 
 ### Commands
-* !uptime (see above)
+* !help
 
 ### New Features
-* Channel for bot to listen/post is now configurable
-* Debug mode is optional and the debug channel is configurable
+* Works on Discord
 
 ### Fixes
-* Less hardcoding
-* Some shuffling around of code
+* Rewritten from the ground up
