@@ -1,9 +1,20 @@
+#Pybot discord-unstable build
+#Misha Larionov and Nicholas Carr
+#github.com/MishaLarionov/pybot/tree/discord-unstable
+
+#TODO:
+#Rework command system
+#Support multiple servers from one bot instance
+#Add todo command
+
 import discord, cfg, time, platform, ast, sched, sys
 #import dateparser
 
+#Client intialization stuff
 client = discord.Client()
 client.login(cfg.EMAIL, cfg.PASSWORD)
-debug = client.get_channel(cfg.DEBUGCH)
+if cfg.DEBUGMODE:
+    debug = client.get_channel(cfg.DEBUGCH)
 
 def readfile():
     d = {}
@@ -52,6 +63,37 @@ def newidea(name, text):
         client.send_message(debug, "Something wiped the file. Restoring to previous version...")
         writedict(dprotect)
     return()
+
+def processcommand(rawstring, channel, user):
+    #This function doesn't do anything yet but it will eventually
+    (cmd, message) = rawstring.split(" ", maxsplit = 1)
+    if cmd == "hello":
+        client.send_message(channel, 'Hello {}!'.format(user.mention()))
+    elif cmd == "idea":
+        idea = message
+        dprotect = readfile()
+        try:
+            newidea(user.id, idea)          
+        except Exception as e:
+            client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
+            writedict(dprotect)
+        else:
+            client.send_message(channel, "{}'s idea has been added.".format(user.mention()))
+    elif cmd == "getideas":
+        #Code goes here someday
+        pass
+    elif cmd == "delidea":
+        #Code goes here someday
+        pass
+    elif cmd == "remind":
+        #Code goes here someday
+        pass
+    elif cmd == "help":
+        #Code goes here someday
+        pass
+    elif cmd == "die":
+        #Secure killswitch
+        pass
 
 def remind(name, channel):
     client.send_message(channel, "You asked me to remind you to" + name)
@@ -109,8 +151,8 @@ def on_message(message):
         else:
             client.send_message(message.channel, "Name not found! Please try again!")
     #Handle idea deletion
-    elif message.content.startswith("!delidea "):
-        (m, num) = message.content.split(" ", maxsplit = 1)
+    elif message.content.startswith("!delidea"):
+        (m, num) = message.content.split(" ", maxsplit = 2)
         try:
             #Makes sure "1" points to d[userID][0]
             num = int(num) - 1
@@ -142,9 +184,10 @@ def on_message(message):
         s.enterabs(dtime.timestamp(), 1, (remind, message.channel), name)
         s.run()
     elif message.content.startswith("!killswitch"):
+        #This should be more secure eventually
         sys.exit()
     elif message.content.startswith("!help"):
-        client.send_message(message.channel, "pybot v5 help\n`!help` shows this page\n`!idea: Put an idea here` Records a suggestion in your name. You can see it with !getideas username\n`!getideas username` lists ideas from user\n`!delidea *number*` deletes the idea with the number supplied\n`!machineinfo` Returns server name and operating system")
+        client.send_message(message.channel, "PYBOT V5 HELP\n`!help` shows this page\n`!idea: <text>` Records a suggestion in your name. You can see it with !getideas\n`!getideas <username>` lists ideas from user\n`!delidea <n>` deletes the idea with the number n\n`!machineinfo` Returns server name and operating system")
 @client.event
 def on_ready():
     debug = client.get_channel(cfg.DEBUGCH)
