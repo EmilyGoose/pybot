@@ -42,13 +42,8 @@ DEBUGMODE = True
 DEBUGCH = "<channel id>"
 ```
 
-# New in v5.0
+NOTE: Pybot v6 will work for multiple servers and will be able to be added via PM, making running your own instance useless.
 
-### Commands
-* !help
+# New since v5.0
 
-### New Features
-* Works on Discord
-
-### Fixes
-* Rewritten from the ground up
+Nothing here yet...
