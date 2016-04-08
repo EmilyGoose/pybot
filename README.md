@@ -1,5 +1,5 @@
 # Pybot
-Bot for Slack built in Python by @MishaLarionov, ported to Discord by @ncarr
+Bot for Slack built in Python by Misha Larionov, ported to Discord by Nicholas Carr
 
 This is a side project of mine, which hopefully will make it easy to keep track of ideas my team has for upcoming hackathons.
 Feel free to use the code, but please credit me (preferably via direct link to this repo). I try to comment it where possible.
