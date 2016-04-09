@@ -49,20 +49,57 @@ def writedict(d):
 
 def newidea(name, text):
     debug = client.get_channel(cfg.DEBUGCH)
-    #Grab the dictionary from the file
-    dprotect = readfile()
-    d = readfile()
     try:
-        #Add the idea to the user's list of ideas
-        d[name].append(text)
-    except:
-        #Create the user in the dictionary if they don't exist
-        d[name] = [text]
-    writedict(d)
-    if readfile() == {}:
-        client.send_message(debug, "Something wiped the file. Restoring to previous version...")
+        #Grab the dictionary from the file
+        dprotect = readfile()
+        d = readfile()
+        try:
+            #Add the idea to the user's list of ideas
+            d[name].append(text)
+        except:
+            #Create the user in the dictionary if they don't exist
+            d[name] = [text]
+        writedict(d)
+        if readfile() == {}:
+            client.send_message(debug, "Something wiped the file. Restoring to previous version...")
+            writedict(dprotect)
+        return()       
+    except Exception as e:
+        client.send_message(message.channel, "Sorry, I couldn't add your idea. Please try again!")
         writedict(dprotect)
-    return()
+    else:
+        client.send_message(message.channel, "{}'s idea has been added.".format(message.author.mention()))
+
+def getideas(name, channel):
+    #message is not defined FIX
+    userNames = []
+    userIDs = []
+    for server in client.servers:
+        for member in server.members:
+            userNames.append(member.name.lower())
+            userIDs.append(member.id)
+    #Check if the user exists
+    if name.lower() in userNames:
+        #Put all this in a function eventually maybe?
+        userpos = userNames.index(name.lower())
+        userID = userIDs[userpos]
+        #Grab the dictionary from the text file
+        d = readfile()
+        #Check if the user is in the idea dictionary
+        if userID in d:
+            #Check if the user has any ideas
+            if len(d[userID]) > 0:
+                #Output a numbered list of the user's ideas
+                s = ("Ideas for " + name.title() + ":")
+                for i in range(0, len(d[userID])):
+                    s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
+                client.send_message(channel, s)
+            else:
+                client.send_message(channel, name.title() + " has not entered any ideas yet!")
+        else:
+            client.send_message(channel, name.title() + " has not entered any ideas yet!")
+    else:
+        client.send_message(channel, "Name not found! Please try again!")
 
 def processcommand(rawstring, channel, user):
     #This function doesn't do anything yet but it will eventually
@@ -70,17 +107,9 @@ def processcommand(rawstring, channel, user):
     if cmd == "hello":
         client.send_message(channel, 'Hello {}!'.format(user.mention()))
     elif cmd == "idea":
-        idea = message
-        dprotect = readfile()
-        try:
-            newidea(user.id, idea)          
-        except Exception as e:
-            client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
-            writedict(dprotect)
-        else:
-            client.send_message(channel, "{}'s idea has been added.".format(user.mention()))
+        newidea(user.id, message)
     elif cmd == "getideas":
-        #Code goes here someday
+        getideas(message, channel)
         pass
     elif cmd == "delidea":
         #Code goes here someday
@@ -110,46 +139,10 @@ def on_message(message):
         client.send_message(message.channel, 'Hello {}!'.format(message.author.mention()))
     #Handle new ideas
     if message.content.startswith('!idea:'):
-        (m, idea) = message.content.split(": ", maxsplit = 1)
-        dprotect = readfile()
-        try:
-            newidea(message.author.id, idea)          
-        except Exception as e:
-            client.send_message(message.channel, "Sorry, I couldn't add your idea. Please try again!")
-            writedict(dprotect)
-        else:
-            client.send_message(message.channel, "{}'s idea has been added.".format(message.author.mention()))
+        newidea(message.author.id, message.content.split(": ", maxsplit = 1)[1])
     #Handle !getideas calls
     elif message.content.startswith("!getideas "):
-        userNames = []
-        userIDs = []
-        for server in client.servers:
-            for member in server.members:
-                userNames.append(member.name.lower())
-                userIDs.append(member.id)
-        (m, name) = message.content.split(" ", maxsplit = 1)
-        #Check if the user exists
-        if name.lower() in userNames:
-            #Put all this in a function eventually maybe?
-            userpos = userNames.index(name.lower())
-            userID = userIDs[userpos]
-            #Grab the dictionary from the text file
-            d = readfile()
-            #Check if the user is in the idea dictionary
-            if userID in d:
-                #Check if the user has any ideas
-                if len(d[userID]) > 0:
-                    #Output a numbered list of the user's ideas
-                    s = ("Ideas for " + name.title() + ":")
-                    for i in range(0, len(d[userID])):
-                        s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
-                    client.send_message(message.channel, s)
-                else:
-                    client.send_message(message.channel, name.title() + " has not entered any ideas yet!")
-            else:
-                client.send_message(message.channel, name.title() + " has not entered any ideas yet!")
-        else:
-            client.send_message(message.channel, "Name not found! Please try again!")
+        getideas(message.content.split(" ", maxsplit = 1)[1], message.channel)
     #Handle idea deletion
     elif message.content.startswith("!delidea"):
         (m, num) = message.content.split(" ", maxsplit = 2)
