@@ -6,14 +6,11 @@
 #Support multiple servers from one bot instance
 #Add todo command
 
-import discord, cfg, time, platform, ast, sched, sys
-#import dateparser
+import discord, cfg, time, platform, ast, sched, sys, dateparser
 
 #Client intialization stuff
 client = discord.Client()
 client.login(cfg.EMAIL, cfg.PASSWORD)
-if cfg.DEBUGMODE:
-    debug = client.get_channel(cfg.DEBUGCH)
 
 def readfile():
     d = {}
@@ -28,7 +25,7 @@ def readfile():
                 d[key] = ast.literal_eval(val)
     except:
         #Create a new file if dict.txt doesn't exist
-        #Or if an error happens. I'll fix that later.
+        #Or if an error happens. Possibly fixed.
         f = open("dict.txt", 'w')
     f.close()
     return(d)
@@ -47,7 +44,6 @@ def writedict(d):
     return()
 
 def newidea(text, user, channel):
-    debug = client.get_channel(cfg.DEBUGCH)
     try:
         #Grab the dictionary from the file
         dprotect = readfile()
@@ -60,7 +56,7 @@ def newidea(text, user, channel):
             d[user.id] = [text]
         writedict(d)
         if readfile() == {}:
-            client.send_message(debug, "Something wiped the file. Restoring to previous version...")
+            debug("Something wiped the file. Restoring to previous version...")
             writedict(dprotect)
     except Exception as e:
         client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
@@ -119,6 +115,7 @@ def delidea(num, author, channel):
         client.send_message(channel, "Invalid number. Please try again.")
 
 def setreminder():
+    #Nicholas's uncommented reminder code
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -128,7 +125,6 @@ def setreminder():
     s.run()
 
 def processcommand(rawstring, channel, user):
-    #This function doesn't do anything yet but it will eventually
     if " " in rawstring:
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
         if cmd == "hello":
@@ -147,7 +143,7 @@ def processcommand(rawstring, channel, user):
     else:
         if rawstring == "hello":
             client.send_message(channel, 'Hello {}!'.format(user.mention()))
-        if rawstring == "die":
+        if rawstring == "die" and user.name in ["ncarr", "Marsroverr"]:
             #This should be more secure eventually
             sys.exit()
         elif rawstring == "machineinfo":
@@ -160,23 +156,24 @@ def processcommand(rawstring, channel, user):
 def remind(name, channel):
     client.send_message(channel, "You asked me to remind you to" + name)
 
+def debug(text):
+    if cfg.DEBUGCH:
+        debug = client.get_channel(cfg.DEBUGCH)
+        client.send_message(debug, text)
+
 @client.event
 def on_message(message):
-    debug = client.get_channel(cfg.DEBUGCH)
-    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)
-    # we do not want the bot to reply to itself
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)    
     if message.author == client.user:
         return
-    if message.content.startswith("!") and len(message.content) > 1:
-        processcommand(message.content[1:], message.channel, message.author)
-    if message.content.startswith("@pybot") and len(message.content) > 7:
-        processcommand(message.content[7:], message.channel, message.author)
+    #if message.content.startswith("!") and len(message.content) > 1:
+        #processcommand(message.content[1:], message.channel, message.author)
+    if message.content.startswith("<@167668157224452097>") and len(message.content) > 22:
+        processcommand(message.content[22:], message.channel, message.author)
 
 @client.event
 def on_ready():
-    debug = client.get_channel(cfg.DEBUGCH)
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected')
-    client.send_message(debug, "Bot started")
 
 client.run()
 createLists()
