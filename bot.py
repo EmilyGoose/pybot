@@ -72,6 +72,7 @@ def newidea(text, user, channel):
 def getideas(name, channel):
     userNames = []
     userIDs = []
+    #This is insecure and needs to be changed
     for server in client.servers:
         for member in server.members:
             userNames.append(member.name.lower())
@@ -92,6 +93,7 @@ def getideas(name, channel):
                 for i in range(0, len(d[userID])):
                     s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
                 client.send_message(channel, s)
+                #Begin descending staircase of error messages
             else:
                 client.send_message(channel, name.title() + " has not entered any ideas yet!")
         else:
@@ -131,10 +133,11 @@ def setreminder():
     s.run()
 
 def processcommand(rawstring, channel, user):
+    #Process the user's commands
     if " " in rawstring:
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
         if cmd == "hello":
-            client.send_message(channel, 'Hello {}!'.format(user.mention()))
+            client.send_message(channel, 'Hello, {}!'.format(user.mention()))
         elif cmd == "idea" or cmd == "idea:":
             newidea(message, user, channel)
         elif cmd == "getideas":
@@ -143,21 +146,28 @@ def processcommand(rawstring, channel, user):
             delidea(message, user.id, channel)
         elif cmd == "remind":
             #Code goes here someday
-            pass
+            print("Reminder code doesn't exist yet, please create some.")
         elif cmd == "help":
-            client.send_message(channel, "PYBOT V5 HELP\n`@pybot help` shows this page\n`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n`@pybot delidea <n>` deletes the idea with the number *n*\n`@pybot machineinfo` Returns server name and operating system")
+            #Send the help message that is waay too long
+            #This should probably be read from a txt file
+            client.send_message(channel, "PYBOT V5 HELP\nhttp://github.com/MishaLarionov/pybot/tree/discord\n`@pybot help` shows this page\n`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n`@pybot delidea <n>` deletes the idea with the number *n*\n`@pybot machineinfo` Returns server name and operating system")
+        else:
+            client.send_message(channel, "Unknown command. Please try again.")
     else:
         if rawstring == "hello":
-            client.send_message(channel, 'Hello {}!'.format(user.mention()))
+            client.send_message(channel, 'Hello, {}!'.format(user.mention()))
         if rawstring == "die" and user.name in ["ncarr", "Marsroverr"]:
-            #This should be more secure eventually
+            #Kill the bot with the top-secret kill switch
+            client.send_message(channel, "brb dying")
             sys.exit()
         elif rawstring == "machineinfo":
             client.send_message(channel, platform.node() + " " + platform.platform())
         elif rawstring == "help":
-            client.send_message(channel, "PYBOT V5 HELP\n`@pybot help` shows this page\n`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n`@pybot delidea <n>` deletes the idea with the number *n*\n`@pybot machineinfo` Returns server name and operating system")
+            client.send_message(channel, "PYBOT V5 HELP\nhttp://github.com/MishaLarionov/pybot/tree/discord\n`@pybot help` shows this page\n`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n`@pybot delidea <n>` deletes the idea with the number *n*\n`@pybot machineinfo` Returns server name and operating system")
         elif rawstring == "getideas":
             getideas(user.name, channel)
+        else:
+            client.send_message(channel, "Unknown command. Please try again.")
 
 def remind(name, channel):
     client.send_message(channel, "You asked me to remind you to" + name)
