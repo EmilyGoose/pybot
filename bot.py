@@ -4,8 +4,9 @@
 
 #TODO:
 #Support multiple servers from one bot instance
-#Add todo command
+#Add todo command (Literally just a clone/rename of ideas)
 
+#Import all the stuff, probably
 import discord, cfg, time, platform, ast, sched, sys, dateparser
 
 #Client intialization stuff
@@ -13,6 +14,7 @@ client = discord.Client()
 client.login(cfg.EMAIL, cfg.PASSWORD)
 
 def readfile():
+    #Function for grabbing the dictionary from the file
     d = {}
     try:
         #Open the file
@@ -31,6 +33,7 @@ def readfile():
     return(d)
 
 def writedict(d):
+    #Function to write the dictionary to the file
     s = ""
     #Get the keys to match them with index numbers
     keys = list(d.keys())
@@ -44,10 +47,12 @@ def writedict(d):
     return()
 
 def newidea(text, user, channel):
+    #Function to add idea for the user
     try:
         #Grab the dictionary from the file
-        dprotect = readfile()
         d = readfile()
+        #Create a backup in case something happens
+        dprotect = readfile()
         try:
             #Add the idea to the user's list of ideas
             d[user.id].append(text)
@@ -116,6 +121,7 @@ def delidea(num, author, channel):
 
 def setreminder():
     #Nicholas's uncommented reminder code
+    #I don't even think this function is ever called
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -157,6 +163,7 @@ def remind(name, channel):
     client.send_message(channel, "You asked me to remind you to" + name)
 
 def debug(text):
+    #Automatically decides whether to debug or not
     if cfg.DEBUGCH:
         debug = client.get_channel(cfg.DEBUGCH)
         client.send_message(debug, text)
@@ -170,6 +177,8 @@ def on_message(message):
         #processcommand(message.content[1:], message.channel, message.author)
     if message.content.startswith("<@167668157224452097>") and len(message.content) > 22:
         processcommand(message.content[22:], message.channel, message.author)
+    elif message.content == "<@167668157224452097>":
+        client.send_message(message.channel, 'Hello {}!'.format(message.author.mention()))
 
 @client.event
 def on_ready():
