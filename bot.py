@@ -3,8 +3,10 @@
 #github.com/MishaLarionov/pybot/tree/discord-unstable
 
 #TODO:
-#Support multiple servers from one bot instance
+#Support multiple servers from one bot instance (Basically more .txt files)
 #Add todo command (Literally just a clone/rename of ideas)
+
+print("Loading... (This may take a while)")
 
 #Import all the stuff, probably
 import discord, cfg, time, platform, ast, sched, sys, dateparser
@@ -12,6 +14,18 @@ import discord, cfg, time, platform, ast, sched, sys, dateparser
 #Client intialization stuff
 client = discord.Client()
 client.login(cfg.EMAIL, cfg.PASSWORD)
+
+#Initialize help string
+helpstring = """
+PYBOT V5 HELP\n
+http://github.com/MishaLarionov/pybot/tree/discord\n
+`@pybot help` shows this page\n
+`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n
+`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n
+`@pybot delidea <n>` deletes the idea with the number *n*\n
+`@pybot clearideas` deletes ALL your ideas\n
+`@pybot machineinfo` Returns server name and operating system
+"""
 
 def readfile():
     #Function for grabbing the dictionary from the file
@@ -91,7 +105,7 @@ def getideas(name, channel):
                 #Output a numbered list of the user's ideas
                 s = ("Ideas for " + name.title() + ":")
                 for i in range(0, len(d[userID])):
-                    s = (s + ("\n" + str(i+1) + ": " + d[userID][i]))
+                    s = (s + ("\n`" + str(i+1) + ":` " + d[userID][i]))
                 client.send_message(channel, s)
                 #Begin descending staircase of error messages
             else:
@@ -110,8 +124,10 @@ def delidea(num, author, channel):
         #Grab the dictionary from the text file
         d = readfile()
         #Make sure the number is not greater than the amount of elements
-        if (num + 1) > len(d[author]):
-            client.send_message(channel, "The number you entered is too large. Please try again.")
+        if (num + 1) > len(d[author]) and len(d[author]) > 0:
+            client.send_message(channel, "That's more ideas than you have! You currently have " + str(len(d[author])) + " ideas entered.")
+        elif len(d[author]) == 0:
+            client.send_message(channel, "You don't have any ideas to delete!")
         else:
             #Get rid of the element
             e = d[author].pop(num)
@@ -120,6 +136,17 @@ def delidea(num, author, channel):
             client.send_message(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
     except:
         client.send_message(channel, "Invalid number. Please try again.")
+
+def clearideas(author, channel):
+    #Grab the dictionary from the text file
+    d = readfile()
+    if len(d[author.id]) == 0:
+        client.send_message(channel, "You don't have any ideas to delete!")
+    else:
+        d[author.id] = []
+        writedict(d)
+        client.send_message(channel, "Ideas for {} cleared.".format(author.mention()))
+    
 
 def setreminder():
     #Nicholas's uncommented reminder code
@@ -144,13 +171,16 @@ def processcommand(rawstring, channel, user):
             getideas(message, channel)
         elif cmd == "delidea":
             delidea(message, user.id, channel)
+        elif cmd == "clearideas":
+            clearideas(user, channel)
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
+            client.send_message(channel, "Remind command has not been migrated to new format.")
         elif cmd == "help":
             #Send the help message that is waay too long
             #This should probably be read from a txt file
-            client.send_message(channel, "PYBOT V5 HELP\nhttp://github.com/MishaLarionov/pybot/tree/discord\n`@pybot help` shows this page\n`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n`@pybot delidea <n>` deletes the idea with the number *n*\n`@pybot machineinfo` Returns server name and operating system")
+            client.send_message(channel, helpstring)
         else:
             client.send_message(channel, "Unknown command. Please try again.")
     else:
@@ -159,11 +189,14 @@ def processcommand(rawstring, channel, user):
         if rawstring == "die" and user.name in ["ncarr", "Marsroverr"]:
             #Kill the bot with the top-secret kill switch
             client.send_message(channel, "brb dying")
+            print(user.name + " has killed me! Avenge me!") 
             sys.exit()
+        elif rawstring == "clearideas":
+            clearideas(user, channel)
         elif rawstring == "machineinfo":
             client.send_message(channel, platform.node() + " " + platform.platform())
         elif rawstring == "help":
-            client.send_message(channel, "PYBOT V5 HELP\nhttp://github.com/MishaLarionov/pybot/tree/discord\n`@pybot help` shows this page\n`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas\n`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.\n`@pybot delidea <n>` deletes the idea with the number *n*\n`@pybot machineinfo` Returns server name and operating system")
+            client.send_message(channel, helpstring)
         elif rawstring == "getideas":
             getideas(user.name, channel)
         else:
@@ -186,13 +219,13 @@ def on_message(message):
     #if message.content.startswith("!") and len(message.content) > 1:
         #processcommand(message.content[1:], message.channel, message.author)
     if message.content.startswith("<@167668157224452097>") and len(message.content) > 22:
-        processcommand(message.content[22:], message.channel, message.author)
+        processcommand(str.strip(message.content[22:]), message.channel, message.author)
     elif message.content == "<@167668157224452097>":
         client.send_message(message.channel, 'Hello {}!'.format(message.author.mention()))
 
 @client.event
 def on_ready():
-    print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected')
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
 
 client.run()
 createLists()

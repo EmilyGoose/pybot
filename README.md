@@ -7,26 +7,29 @@ This is still very unstable, so if you would like to make a pull request, please
 
 # Usage
 
-### !idea: \<text\>
+### @pybot idea: \<text\>
 
 Enters an idea. Make sure there is a space after the colon
 
 
-### !getideas \<name\>
+### @pybot getideas \<name\>
 
-Gets an idea. Make sure the name matches the person's first name (if they haven't set one, their Slack username) as of the bot's last restart.
-Make sure there is a space between the command and the person's name.
+Gets an idea. Must be a name, not an @mention. Omit the name parameter to get your own ideas
 
 
-### !delidea \<*n*\>
+### @pybot delidea \<*n*\>
 
 Deletes the *n*th idea in your list of ideas. It is recommended to call !getideas first.
 
-### !machineinfo
+### @pybot clearideas
+
+Deletes ALL your ideas. Use with caution.
+
+### @pybot machineinfo
 
 Displays information about the machine running the bot
 
-### !help
+### @pybot help
 
 Displays version info and a list of commands
 
@@ -38,7 +41,7 @@ Create a file named "cfg.py" in the same folder. The file should look like this:
 ```Python
 EMAIL = "<redacted>"
 PASSWORD = "<redacted>"
-DEBUGMODE = True
+DEBUGMODE = False #Or True if you REALLY want
 DEBUGCH = "<channel id>"
 ```
 
@@ -46,4 +49,11 @@ NOTE: Pybot v6 will work for multiple servers and will be able to be added via P
 
 # New since v5.0
 
-Nothing here yet...
+### Commands
+
+* Clearideas command
+
+### Other
+
+* Fixes to command processing
+* Fixes to help command
