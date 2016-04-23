@@ -111,9 +111,11 @@ $RECYCLE.BIN/
 # Bot token
 cfg.py
 
-# Dictionary
+# Data
 dict.txt
 usdict.txt
+data/*
+!data/README.md
 
 # Crash log
 log.txt
