@@ -44,7 +44,7 @@ def readfile(channel):
     except:
         try:
             #Open the main file if the channel is not separate
-            with open("data/dict.txt", 'r') as f:
+            with open("data/" + channel.server.id + ".txt", 'r') as f:
                 for line in f:
                     #Grab the keys and values
                     (key, val) = line.split("|", maxsplit = 1)
@@ -54,7 +54,7 @@ def readfile(channel):
         except:
             #Create a new file if dict.txt doesn't exist
             #Or if an error happens. Possibly fixed.
-            f = open("data/dict.txt", 'w')
+            f = open("data/" + channel.server.id + ".txt", 'w')
             f.write("responses|{}")
     f.close()
     return(d)
@@ -70,7 +70,7 @@ def writedict(d, channel):
     try:
         f = open("data/" + channel.id + ".txt", 'w')
     except:
-        f = open("data/dict.txt", 'w')
+        f = open("data/" + channel.server.id + ".txt", 'w')
     #Overwrite the file with the new content
     f.write(s)
     f.close()
@@ -155,9 +155,9 @@ def delidea(num, author, channel):
 def splitchannel(channel):
     #Overwrite the file with the new content
     try:
-        f = open(channel.id + ".txt", 'r')
+        f = open("data/" + channel.id + ".txt", 'r')
     except:
-        f = open(channel.id + ".txt", 'w')
+        f = open("data/" + channel.id + ".txt", 'w')
         f.write("responses|{}")
         client.send_message(channel, "Any new ideas posted here will be kept separate and only accessible in this channel.")
     else:
@@ -168,13 +168,13 @@ def splitchannel(channel):
 def mergechannel(channel):
     #Overwrite the file with the new content
     try:
-        f = open(channel.id + ".txt", 'r')
+        f = open("data/" + channel.id + ".txt", 'r')
         f.close()
     except:
         client.send_message(channel, "Channel uses the main idea database. Use `@pybot splitchannel` to split it.")
     else:
         d1 = readfile(channel)
-        os.remove(channel.id + ".txt")
+        os.remove("data/" + channel.id + ".txt")
         d2 = readfile(channel)
         s = ""
         #Get the keys to match them with index numbers
@@ -193,7 +193,7 @@ def mergechannel(channel):
                 s = (s + keys[i] + "|" + str(d2[keys[i]]) + "\n")
         s = (s + "responses|" + str(d2["responses"]))
         
-        f2 = open("dict.txt", 'w')
+        f2 = open("data/" + channel.server.id + ".txt", 'w')
         f2.write(s)
         f2.close()
         client.send_message(channel, "Successfully merged channel.")
