@@ -19,7 +19,7 @@ Gets an idea. Must be a name, not an @mention. Omit the name parameter to get yo
 
 ### @pybot delidea \<*n*\>
 
-Deletes the *n*th idea in your list of ideas. It is recommended to call !getideas first.
+Deletes the *n* th idea in your list of ideas. It is recommended to call !getideas first.
 
 ### @pybot clearideas
 
@@ -28,6 +28,18 @@ Deletes ALL your ideas. Use with caution.
 ### @pybot machineinfo
 
 Displays information about the machine running the bot
+
+### @pybot splitchannel
+
+Keeps future ideas from channel separate and private to the channel
+
+### @pybot mergechannel
+
+Makes ideas from channel available to other channels
+
+@pybot setresponse "\<*response*\>" for "\<*call*\>"
+
+Has pybot respond with *response* whenever a message matches *call*
 
 ### @pybot help
 
@@ -43,6 +55,8 @@ EMAIL = "<redacted>"
 PASSWORD = "<redacted>"
 DEBUGMODE = False #Or True if you REALLY want
 DEBUGCH = "<channel id>"
+BOTID = "<bot Discord ID used in @mentions>"
+BOTNAME = "<bot username>"
 ```
 
 NOTE: Pybot v6 will work for multiple servers and will be able to be added via PM, making running your own instance useless.
@@ -51,7 +65,10 @@ NOTE: Pybot v6 will work for multiple servers and will be able to be added via P
 
 ### Commands
 
-* Clearideas command
+* clearideas command
+* mergechannel command
+* splitchannel command
+* setresponse command
 
 ### Other
 
