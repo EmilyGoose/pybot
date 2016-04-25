@@ -23,8 +23,8 @@ http://github.com/MishaLarionov/pybot/tree/discord\n
 `@pybot delidea <n>` deletes the idea with the number *n*
 `@pybot clearideas` deletes ALL your ideas
 `@pybot machineinfo` Gets server name and operating system
-`@pybot splitchannel` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run.
-`@pybot mergechannel` Makes ideas from channel available to all channels.
+`@pybot splitserver` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run.
+`@pybot mergeserver` Makes ideas from channel available to all channels.
 `@pybot setresponse \"<response>\" for \"<call>\"` Has me respond with *response* whenever your message matches *call*
 `@pybot getresponses` Gets all automated responses
 `@pybot delresponse <call>` Deletes the response for call
@@ -171,7 +171,7 @@ def delidea(num, author, channel):
         yield from client.send_message(channel, "Invalid number. Please try again.")
 
 @asyncio.coroutine
-def splitchannel(channel):
+def splitserver(channel):
     #Overwrite the file with the new content
     try:
         f = open("data/" + channel.id + ".txt", 'r')
@@ -180,18 +180,18 @@ def splitchannel(channel):
         f.write("responses|{}")
         yield from client.send_message(channel, "Any new ideas posted here will be kept separate and only accessible in this channel.")
     else:
-        yield from client.send_message(channel, "Channel already separate. Use `@pybot mergechannel` to merge this channel with the main idea database, copying all data.")
+        yield from client.send_message(channel, "Channel already separate. Use `@pybot mergeserver` to merge this channel with the main idea database, copying all data.")
     f.close()
     return()
 
 @asyncio.coroutine
-def mergechannel(channel):
+def mergeserver(channel):
     #Overwrite the file with the new content
     try:
         f = open("data/" + channel.id + ".txt", 'r')
         f.close()
     except:
-        yield from client.send_message(channel, "Channel uses the main idea database. Use `@pybot splitchannel` to split it.")
+        yield from client.send_message(channel, "Channel uses the main idea database. Use `@pybot splitserver` to split it.")
     else:
         try:
             server = channel.server.id
@@ -343,10 +343,10 @@ def processcommand(rawstring, channel, user):
             yield from getresponses(channel)
         elif rawstring == "clearresponses":
             yield from clearresponses(channel)
-        elif rawstring == "splitchannel":
-            yield from splitchannel(channel)
-        elif rawstring == "mergechannel":
-            yield from mergechannel(channel)
+        elif rawstring == "splitserver":
+            yield from splitserver(channel)
+        elif rawstring == "mergeserver":
+            yield from mergeserver(channel)
         else:
             yield from client.send_message(channel, "Unknown command. Please try again.")
 
