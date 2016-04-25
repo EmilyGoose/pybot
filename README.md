@@ -81,8 +81,6 @@ BOTID = "<bot Discord ID used in @mentions>"
 BOTNAME = "<bot username>"
 ```
 
-NOTE: Pybot v6 will work for multiple servers and will be able to be added via a link, making running your own instance useless.
-
 ## New since v5.0
 
 ### Commands
@@ -94,6 +92,7 @@ NOTE: Pybot v6 will work for multiple servers and will be able to be added via a
 * delresponse command
 * getresponses command
 * clearresponses command
+* versioninfo command
 
 ### Other
 

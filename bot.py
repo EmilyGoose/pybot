@@ -8,8 +8,10 @@
 
 print("Loading... (This may take a while)")
 
-#Import all the stuff, probably
-import discord, cfg, time, platform, ast, sched, sys, os, dateparser, asyncio
+#Import all the stuff
+import cfg, time, platform, ast, sched, sys, os, dateparser
+#Second line of import statements. These may need to be installed
+import asyncio, discord, requests
 
 #Client intialization stuff
 client = discord.Client()
@@ -295,7 +297,16 @@ def clearresponses(channel):
     else:
         yield from client.send_message(channel, "There are no responses here!")
 
-
+@asyncio.coroutine
+def versioninfo(channel):
+    #UNFINISHED
+    sourcecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py')
+    currentcode = open("bot.py", "r")
+    if sourcecode == currentcode:
+        pass
+    else:
+        client.send_message(channel, "placeholder")
+    
 @asyncio.coroutine
 def processcommand(rawstring, channel, user):
     #Process the user's commands
@@ -350,6 +361,9 @@ def processcommand(rawstring, channel, user):
             yield from splitchannel(channel)
         elif rawstring == "mergechannel":
             yield from mergechannel(channel)
+        elif rawstring == "versioninfo":
+            #yield from versioninfo(channel)
+            pass
         else:
             yield from client.send_message(channel, "Unknown command. Please try again.")
 
