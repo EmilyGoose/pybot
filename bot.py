@@ -178,9 +178,9 @@ def splitserver(channel):
     except:
         f = open("data/" + channel.id + ".txt", 'w')
         f.write("responses|{}")
-        yield from client.send_message(channel, "Any new ideas posted here will be kept separate and only accessible in this channel.")
+        yield from client.send_message(channel, "Any new ideas posted here will be kept separate and only accessible in this server.")
     else:
-        yield from client.send_message(channel, "Channel already separate. Use `@pybot mergeserver` to merge this channel with the main idea database, copying all data.")
+        yield from client.send_message(channel, "Server already separate. Use `@pybot mergeserver` to merge this server with the main branch, copying all data.")
     f.close()
     return()
 
@@ -218,9 +218,9 @@ def mergeserver(channel):
             f2 = open("data/" + server + ".txt", 'w')
             f2.write(s)
             f2.close()
-            yield from client.send_message(channel, "Successfully merged channel.")
+            yield from client.send_message(channel, "Successfully merged server with the main branch.")
         except AttributeError:
-            yield from client.send_message(channel, "This channel is not attached to a server, likely a Direct Message. Ideas cannot be merged.")
+            yield from client.send_message(channel, "This server is not attached to a server, likely a Direct Message. Ideas cannot be merged.")
     return()
 
 @asyncio.coroutine
@@ -238,6 +238,8 @@ def clearideas(author, channel):
 def setreminder():
     #Nicholas's uncommented reminder code
     #I don't even think this function is ever called
+    #Nicholas why is this here
+    #I'll just keep adding comments every update until you fix this
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
