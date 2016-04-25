@@ -9,11 +9,10 @@
 print("Loading... (This may take a while)")
 
 #Import all the stuff, probably
-import discord, cfg, time, platform, ast, sched, sys, os, dateparser
+import discord, cfg, time, platform, ast, sched, sys, os, dateparser, asyncio
 
 #Client intialization stuff
 client = discord.Client()
-client.login(cfg.EMAIL, cfg.PASSWORD)
 
 #Initialize help string
 helpstring = """PYBOT V5 HELP
@@ -23,15 +22,18 @@ http://github.com/MishaLarionov/pybot/tree/discord\n
 `@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.
 `@pybot delidea <n>` deletes the idea with the number *n*
 `@pybot clearideas` deletes ALL your ideas
-`@pybot machineinfo` Returns server name and operating system
-`@pybot splitchannel` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run. Can be undone with `@pybot mergechannel`
-`@pybot mergechannel` Makes ideas from channel available to all channels; undoes `@pybot splitchannel`.
-`@pybot setresponse \"<response>\" for \"<call>\"` Has me respond whenever your message matches *call*
+`@pybot machineinfo` Gets server name and operating system
+`@pybot splitchannel` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run.
+`@pybot mergechannel` Makes ideas from channel available to all channels.
+`@pybot setresponse \"<response>\" for \"<call>\"` Has me respond with *response* whenever your message matches *call*
+`@pybot getresponses` Gets all automated responses
+`@pybot delresponse <call>` Deletes the response for call
+`@pybot clearresponses` Deletes ALL responses
 """
 
 def readfile(channel):
     #Function for grabbing the dictionary from the file
-    d = {}
+    d = {"responses": {}}
     try:
         #See if the channel exists
         with open("data/" + channel.id + ".txt", 'r') as f:
@@ -52,10 +54,16 @@ def readfile(channel):
                     #Literally no clue how this line works
                     d[key] = ast.literal_eval(val)
         except:
-            #Create a new file if dict.txt doesn't exist
-            #Or if an error happens. Possibly fixed.
-            f = open("data/" + channel.server.id + ".txt", 'w')
-            f.write("responses|{}")
+            try:
+                #Create a new file if <server>.txt doesn't exist
+                #Or if an error happens. Possibly fixed.
+                f = open("data/" + channel.server.id + ".txt", 'w')
+                f.write("responses|{}")
+            except:
+                #Create a new file if the channel doesn't exist or belong to a server
+                #Or if an error happens. Possibly fixed.
+                f = open("data/" + channel.id + ".txt", 'w')
+                f.write("responses|{}")
     f.close()
     return(d)
 
@@ -76,6 +84,7 @@ def writedict(d, channel):
     f.close()
     return()
 
+@asyncio.coroutine
 def newidea(text, user, channel):
     #Function to add idea for the user
     try:
@@ -91,22 +100,29 @@ def newidea(text, user, channel):
             d[user.id] = [text]
         writedict(d, channel)
         if readfile(channel) == {}:
-            debug("Something wiped the file. Restoring to previous version...")
+            yield from debug("Something wiped the file. Restoring to previous version...")
             writedict(dprotect, channel)
     except Exception as e:
-        client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
+        yield from client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
         writedict(dprotect)
     else:
-        client.send_message(channel, "{}'s idea has been added.".format(user.mention()))
+        yield from client.send_message(channel, "{}'s idea has been added.".format(user.mention))
 
+@asyncio.coroutine
 def getideas(name, channel):
+    mentions = []
     userNames = []
     userIDs = []
     #This is insecure and needs to be changed
-    for server in client.servers:
-        for member in server.members:
+    try:
+        for member in channel.server.members:
+            mentions.append(member.mention)
             userNames.append(member.name.lower())
             userIDs.append(member.id)
+    except AttributeError:
+        mentions.append(channel.user.mention)
+        userNames.append(channel.user.name.lower())
+        userIDs.append(channel.user.id)
     #Check if the user exists
     if name.lower() in userNames:
         #Put all this in a function eventually maybe?
@@ -119,18 +135,19 @@ def getideas(name, channel):
             #Check if the user has any ideas
             if len(d[userID]) > 0:
                 #Output a numbered list of the user's ideas
-                s = ("Ideas for " + name.title() + ":")
+                s = ("Ideas for " + mentions[userpos] + ":")
                 for i in range(0, len(d[userID])):
                     s = (s + ("\n`" + str(i+1) + ":` " + d[userID][i]))
-                client.send_message(channel, s)
+                yield from client.send_message(channel, s)
                 #Begin descending staircase of error messages
             else:
-                client.send_message(channel, name.title() + " has not entered any ideas yet!")
+                yield from client.send_message(channel, mentions[userpos] + " has not entered any ideas yet!")
         else:
-            client.send_message(channel, name.title() + " has not entered any ideas yet!")
+            yield from client.send_message(channel, mentions[userpos] + " has not entered any ideas yet!")
     else:
-        client.send_message(channel, "Name not found! Please try again!")
+        yield from client.send_message(channel, "Name not found! Please try again!")
 
+@asyncio.coroutine
 def delidea(num, author, channel):
     try:
         #Makes sure "1" points to d[userID][0]
@@ -143,15 +160,17 @@ def delidea(num, author, channel):
         if (num + 1) > len(d[author]) and len(d[author]) > 0:
             client.send_message(channel, "That's more ideas than you have! You currently have " + str(len(d[author])) + " ideas entered.")
         elif len(d[author]) == 0:
-            client.send_message(channel, "You don't have any ideas to delete!")
+            yield from client.send_message(channel, "You don't have any ideas to delete!")
         else:
             #Get rid of the element
             e = d[author].pop(num)
             #Rebuild the dictionary
             writedict(d, channel)
-            client.send_message(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
+            yield from client.send_message(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
     except:
-        client.send_message(channel, "Invalid number. Please try again.")
+        yield from client.send_message(channel, "Invalid number. Please try again.")
+
+@asyncio.coroutine
 def splitchannel(channel):
     #Overwrite the file with the new content
     try:
@@ -159,55 +178,61 @@ def splitchannel(channel):
     except:
         f = open("data/" + channel.id + ".txt", 'w')
         f.write("responses|{}")
-        client.send_message(channel, "Any new ideas posted here will be kept separate and only accessible in this channel.")
+        yield from client.send_message(channel, "Any new ideas posted here will be kept separate and only accessible in this channel.")
     else:
-        client.send_message(channel, "Channel already separate. Use `@pybot mergechannel` to merge this channel with the main idea database, copying all data.")
+        yield from client.send_message(channel, "Channel already separate. Use `@pybot mergechannel` to merge this channel with the main idea database, copying all data.")
     f.close()
     return()
 
+@asyncio.coroutine
 def mergechannel(channel):
     #Overwrite the file with the new content
     try:
         f = open("data/" + channel.id + ".txt", 'r')
         f.close()
     except:
-        client.send_message(channel, "Channel uses the main idea database. Use `@pybot splitchannel` to split it.")
+        yield from client.send_message(channel, "Channel uses the main idea database. Use `@pybot splitchannel` to split it.")
     else:
-        d1 = readfile(channel)
-        os.remove("data/" + channel.id + ".txt")
-        d2 = readfile(channel)
-        s = ""
-        #Get the keys to match them with index numbers
-        keys = list(d1.keys()) + list(d2.keys())
-        
-        for i in range(0, len(keys)):
-            if keys[i] == "responses":
-                pass
-            #Write each line of the file with the proper syntax
-            elif keys[i] in d1:
-                if keys[i] in d2:
-                    s = (s + keys[i] + "|" + str(d1[keys[i]] + d2[keys[i]]) + "\n")
+        try:
+            server = channel.server.id
+            d1 = readfile(channel)
+            os.remove("data/" + channel.id + ".txt")
+            d2 = readfile(channel)
+            s = ""
+            #Get the keys to match them with index numbers
+            keys = list(d1.keys()) + list(d2.keys())
+            
+            for i in range(0, len(keys)):
+                if keys[i] == "responses":
+                    pass
+                #Write each line of the file with the proper syntax
+                elif keys[i] in d1:
+                    if keys[i] in d2:
+                        s = (s + keys[i] + "|" + str(d1[keys[i]] + d2[keys[i]]) + "\n")
+                    else:
+                        s = (s + keys[i] + "|" + str(d1[keys[i]]) + "\n")
                 else:
-                    s = (s + keys[i] + "|" + str(d1[keys[i]]) + "\n")
-            else:
-                s = (s + keys[i] + "|" + str(d2[keys[i]]) + "\n")
-        s = (s + "responses|" + str(d2["responses"]))
-        
-        f2 = open("data/" + channel.server.id + ".txt", 'w')
-        f2.write(s)
-        f2.close()
-        client.send_message(channel, "Successfully merged channel.")
+                    s = (s + keys[i] + "|" + str(d2[keys[i]]) + "\n")
+            s = (s + "responses|" + str(d2["responses"]))
+            
+            f2 = open("data/" + server + ".txt", 'w')
+            f2.write(s)
+            f2.close()
+            yield from client.send_message(channel, "Successfully merged channel.")
+        except AttributeError:
+            yield from client.send_message(channel, "This channel is not attached to a server, likely a Direct Message. Ideas cannot be merged.")
     return()
 
+@asyncio.coroutine
 def clearideas(author, channel):
     #Grab the dictionary from the text file
     d = readfile(channel)
     if len(d[author.id]) == 0:
-        client.send_message(channel, "You don't have any ideas to delete!")
+        yield from client.send_message(channel, "You don't have any ideas to delete!")
     else:
         d[author.id] = []
         writedict(d, channel)
-        client.send_message(channel, "Ideas for {} cleared.".format(author.mention()))
+        yield from client.send_message(channel, "Ideas for {} cleared.".format(author.mention))
     
 
 def setreminder():
@@ -221,90 +246,143 @@ def setreminder():
     s.enterabs(dtime.timestamp(), 1, (remind, message.channel), name)
     s.run()
 
+@asyncio.coroutine
 def setresponse(response, call, channel):
     d = readfile(channel)
     if call in d["responses"]:
-        client.send_message(channel, "I already respond with `" + d[call] + "`")
+        oldresponse = d["responses"][call]
+        d["responses"][call] = response
+        writedict(d, channel)
+        yield from client.send_message(channel, "Changed response from `" + oldresponse + "` to `" + response + "`.")
     else:
         d["responses"][call] = response
         writedict(d, channel)
-        client.send_message(channel, "Added response to list")
+        yield from client.send_message(channel, "Added response to list")
 
+@asyncio.coroutine
+def delresponse(call, channel):
+    d = readfile(channel)
+    if call in d["responses"]:
+        del(d["responses"][call])
+        writedict(d, channel)
+        yield from client.send_message(channel, "Removed response.")
+    else:
+        yield from client.send_message(channel, "I don't respond to that!")
+
+@asyncio.coroutine
+def getresponses(channel):
+    d = readfile(channel)
+    #Check if there are any responses
+    if d["responses"]:
+        #Output a numbered list of the user's ideas
+        s = ("I respond with:")
+        for i in d["responses"]:
+            s = (s + ("\n`" + d["responses"][i] + "` for `" + i + "`"))
+        yield from client.send_message(channel, s)
+    else:
+        yield from client.send_message(channel, "There are no responses here!")
+
+@asyncio.coroutine
+def clearresponses(channel):
+    d = readfile(channel)
+    if len(d["responses"]) > 0:
+        d["responses"] = {}
+        writedict(d, channel)
+        yield from client.send_message(channel, "Removed responses.")
+    else:
+        yield from client.send_message(channel, "There are no responses here!")
+
+
+@asyncio.coroutine
 def processcommand(rawstring, channel, user):
     #Process the user's commands
     if " " in rawstring:
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
         if cmd == "hello":
-            client.send_message(channel, 'Hello, {}!'.format(user.mention()))
+            yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         elif cmd == "idea" or cmd == "idea:":
-            newidea(message, user, channel)
+            yield from newidea(message, user, channel)
         elif cmd == "getideas":
-            getideas(message, channel)
+            yield from getideas(message, channel)
         elif cmd == "delidea":
-            delidea(message, user.id, channel)
+            yield from delidea(message, user.id, channel)
         elif cmd == "clearideas":
-            clearideas(user, channel)
+            yield from clearideas(user, channel)
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
-            client.send_message(channel, "Remind command has not been migrated to new format.")
+            yield from client.send_message(channel, "Remind command has not been migrated to new format.")
         elif cmd == "help":
-            client.send_message(channel, helpstring)
+            yield from client.send_message(channel, helpstring)
         elif cmd == "setresponse":
-            setresponse(message.split("\"")[1], message.split("\"")[3], channel)
+            try:
+                yield from setresponse(message.split("\"")[1], message.split("\"")[3], channel)
+            except IndexError:
+                yield from client.send_message(channel, "Improper syntax! For me to understand responses with spaces, please put your call and response in double quotes.")
+        elif cmd == "delresponse":
+            yield from delresponse(message, channel)
         else:
-            client.send_message(channel, "Unknown command. Please try again.")
+            yield from client.send_message(channel, "Unknown command. Please try again.")
     else:
         if rawstring == "hello":
-            client.send_message(channel, 'Hello, {}!'.format(user.mention()))
+            yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         if rawstring == "die" and user.name in ["ncarr", "Marsroverr"]:
             #Kill the bot with the top-secret kill switch
-            client.send_message(channel, "brb dying")
+            yield from client.send_message(channel, "brb dying")
             print(user.name + " has killed me! Avenge me!") 
             sys.exit()
         elif rawstring == "clearideas":
-            clearideas(user, channel)
+            yield from clearideas(user, channel)
         elif rawstring == "machineinfo":
-            client.send_message(channel, platform.node() + " " + platform.platform())
+            yield from client.send_message(channel, platform.node() + " " + platform.platform())
         elif rawstring == "help":
-            client.send_message(channel, helpstring)
+            yield from client.send_message(channel, helpstring)
         elif rawstring == "getideas":
-            getideas(user.name, channel)
+            yield from getideas(user.name, channel)
+        elif rawstring == "getresponses":
+            yield from getresponses(channel)
+        elif rawstring == "clearresponses":
+            yield from clearresponses(channel)
         elif rawstring == "splitchannel":
-            splitchannel(channel)
+            yield from splitchannel(channel)
         elif rawstring == "mergechannel":
-            mergechannel(channel)
+            yield from mergechannel(channel)
         else:
-            client.send_message(channel, "Unknown command. Please try again.")
+            yield from client.send_message(channel, "Unknown command. Please try again.")
 
+@asyncio.coroutine
 def remind(name, channel):
-    client.send_message(channel, "You asked me to remind you to" + name)
+    yield from client.send_message(channel, "You asked me to remind you to" + name)
 
+@asyncio.coroutine
 def debug(text):
     #Automatically decides whether to debug or not
     if cfg.DEBUGMODE:
         debug = client.get_channel(cfg.DEBUGCH)
-        client.send_message(debug, text)
+        yield from client.send_message(debug, text)
 
 @client.event
+@asyncio.coroutine
 def on_message(message):
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)    
     if message.author == client.user:
         return
     #if message.content.startswith("!") and len(message.content) > 1:
-        #processcommand(message.content[1:], message.channel, message.author)
+        #yield from processcommand(message.content[1:], message.channel, message.author)
     if message.content.startswith("<@" + cfg.BOTID + ">") and len(message.content) > 22:
-        processcommand(str.strip(message.content[22:]), message.channel, message.author)
+        yield from processcommand(str.strip(message.content[22:]), message.channel, message.author)
     if message.content.startswith("@" + cfg.BOTNAME) and len(message.content) > 7:
-        processcommand(str.strip(message.content[7:]), message.channel, message.author)
+        yield from processcommand(str.strip(message.content[7:]), message.channel, message.author)
     elif message.content == "<@" + cfg.BOTID + ">":
-        client.send_message(message.channel, 'Hello {}!'.format(message.author.mention()))
+        yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
+    elif message.content == "@" + cfg.BOTNAME:
+        yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
     elif message.content in readfile(message.channel)["responses"]:
-        client.send_message(message.channel, readfile(message.channel)["responses"][message.content])
+        yield from client.send_message(message.channel, readfile(message.channel)["responses"][message.content])
 
 @client.event
+@asyncio.coroutine
 def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
 
-client.run()
-createLists()
+client.run(cfg.TOKEN)
