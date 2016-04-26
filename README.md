@@ -62,6 +62,7 @@ Deletes ALL responses
 ### getout
 
 Pybot leaves the server :(
+
 (Only the owner can use this)
 
 ### help
