@@ -303,17 +303,17 @@ def clearresponses(channel):
 @asyncio.coroutine
 def versioninfo(channel):
     #This might work. Probably.
-    sourcecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py')
-    currentcode = open("bot.py", "r")
-    if sourcecode == currentcode:
-        client.send_message(channel, "This bot is running the latest stable version.")
-        return
-    sourcecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py')
-    if sourcecode == currentcode:
-        client.send_message(channel, "This bot is running the latest unstable build.")
+    sourcetemp = open("bot.py", "r")
+    currentcode = sourcetemp.read()
+    print(currentcode)
+    if currentcode == requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py'):
+        yield from client.send_message(channel, "This bot instance is up to date with the latest stable build.")
+    elif currentcode == requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py'):
+        yield from client.send_message(channel, "This bot instance is up to date with the latest unstable build.")
     else:
-        client.send_message(channel, "This bot is not running an up-to-date version! Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
-        
+        yield from client.send_message(channel, "This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
+    
+    
 @asyncio.coroutine
 def processcommand(rawstring, channel, user):
     #Process the user's commands
