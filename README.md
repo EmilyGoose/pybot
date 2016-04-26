@@ -79,7 +79,8 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
 1. Install Python >= 3.4
 
 2. Install the async branch of [discord.py](https://github.com/Rapptz/discord.py/tree/async). You can do this through pip if you have git installed:
-```
+
+..```
 pip install git+https://github.com/Rapptz/discord.py@async
 ```
 3. Set up a Discord bot user (Not a regular user. To set up a bot user [click here](https://discordapp.com/developers/applications/me))
@@ -88,7 +89,7 @@ pip install git+https://github.com/Rapptz/discord.py@async
 
 5. Create a file named "cfg.py" in the same folder. The file should look like this:
 
-```Python
+..```Python
 TOKEN = "<redacted>"
 DEBUGMODE = False #Or True if you REALLY want
 DEBUGCH = "<channel id>" #Isn't entirely necessary if DEBUGMODE is False
