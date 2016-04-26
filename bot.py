@@ -303,6 +303,7 @@ def clearresponses(channel):
 @asyncio.coroutine
 def versioninfo(channel):
     #This might work. Probably.
+    #It doesn't work even though logically it should
     sourcetemp = open("bot.py", "r")
     currentcode = sourcetemp.read()
     stablecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py')
@@ -352,8 +353,9 @@ def processcommand(rawstring, channel, user):
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         if rawstring == "die":
             try:
+                print(user.name + " tried to kill the bot!")
                 if any(cfg.ADMINROLE == role.id for role in user.roles):
-                    #Kill the bot with the top-secret kill switch
+                    #The above if statement doesn't work
                     yield from client.send_message(channel, "brb dying")
                     print(user.name + " has killed me! Avenge me!") 
                     yield from client.logout()
