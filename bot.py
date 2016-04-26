@@ -9,9 +9,9 @@
 print("Loading... (This may take a while)")
 
 #Import all the stuff
-import cfg, time, platform, ast, sched, sys, os, dateparser
+import cfg, time, platform, ast, sys, os, re
 #Second line of import statements. These may need to be installed
-import asyncio, discord, requests
+import asyncio, discord, requests, dateparser
 
 #Client intialization stuff
 client = discord.Client()
@@ -254,6 +254,7 @@ def setreminder():
 @asyncio.coroutine
 def setresponse(response, call, channel):
     d = readfile(channel)
+    call = re.sub('([.,!?()])', r' \1 ', call)
     if call in d["responses"]:
         oldresponse = d["responses"][call]
         d["responses"][call] = response
@@ -267,6 +268,7 @@ def setresponse(response, call, channel):
 @asyncio.coroutine
 def delresponse(call, channel):
     d = readfile(channel)
+    call = re.sub('([.,!?()])', r' \1 ', call)
     if call in d["responses"]:
         del(d["responses"][call])
         writedict(d, channel)
@@ -340,11 +342,15 @@ def processcommand(rawstring, channel, user):
     else:
         if rawstring == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
-        if rawstring == "die" and user.name in ["ncarr", "Marsroverr"]:
-            #Kill the bot with the top-secret kill switch
-            yield from client.send_message(channel, "brb dying")
-            print(user.name + " has killed me! Avenge me!") 
-            sys.exit()
+        if rawstring == "die":
+            try:
+                if any(cfg.ADMINROLE == role.id for role in user.roles):
+                    #Kill the bot with the top-secret kill switch
+                    yield from client.send_message(channel, "brb dying")
+                    print(user.name + " has killed me! Avenge me!") 
+                    yield from client.logout()
+            except:
+                yield from client.send_message(channel, "You need to be in a server to kill me.")
         elif rawstring == "clearideas":
             yield from clearideas(user, channel)
         elif rawstring == "machineinfo":
@@ -378,25 +384,33 @@ def debug(text):
         debug = client.get_channel(cfg.DEBUGCH)
         yield from client.send_message(debug, text)
 
+@asyncio.coroutine
+def processresponse(message):
+    for word in readfile(message.channel)["responses"]:
+        #Pad and sub to ensure only whole words are matched and punctuation doesn't stop matches
+        if (" " + word + " ") in re.sub('([.,!?()])', r' \1 ', " " + message.content + " "):
+            yield from client.send_message(message.channel, readfile(message.channel)["responses"][word])
+            return True
+    return False
+
 @client.event
 @asyncio.coroutine
 def on_message(message):
-    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name.title() + " says: " + message.content)    
+    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name + " says: " + message.content)
     if message.author == client.user:
         return
     #if message.content.startswith("!") and len(message.content) > 1:
         #yield from processcommand(message.content[1:], message.channel, message.author)
-    if message.content.startswith("<@" + cfg.BOTID + ">") and len(message.content) > 22:
+    if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
         yield from processcommand(str.strip(message.content[22:]), message.channel, message.author)
-    if message.content.startswith("@" + cfg.BOTNAME) and len(message.content) > 7:
+    if message.content.startswith("@" + client.user.name) and len(message.content) > 7:
         yield from processcommand(str.strip(message.content[7:]), message.channel, message.author)
-    elif message.content == "<@" + cfg.BOTID + ">":
+    elif message.content == "<@" + client.user.id + ">":
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
-    elif message.content == "@" + cfg.BOTNAME:
+    elif message.content == "@" + client.user.name:
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
-    elif message.content in readfile(message.channel)["responses"]:
-        yield from client.send_message(message.channel, readfile(message.channel)["responses"][message.content])
-
+    else:
+        yield from processresponse(message)
 @client.event
 @asyncio.coroutine
 def on_ready():
