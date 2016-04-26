@@ -58,11 +58,19 @@ Gets all responses
 
 Deletes ALL responses.
 
+### @pybot getout
+
+Pybot leaves the server :(
+(Only the owner can use this)
+
 ### @pybot help
 
 Displays version info and a list of commands
 
 ## Setup instructions
+
+*NOTE: If you would like to add pybot to your server [click here](http://bit.ly/addpybot) instead.*
+Unless you REALLY want to, you can rely on the instance run by me.
 
 Install Python >= 3.4
 
@@ -94,12 +102,12 @@ ADMINROLE = "<role id>" #Role of people who can kill the bot
 * delresponse command
 * getresponses command
 * clearresponses command
-* versioninfo command
+* getout command
 
 ### Other
 
 * Fixes to command processing
 * Fixes to help command
-* Fixes to help make multiple servers a reality
+* Compatibility with multiple servers
 * Now uses discord.py async branch and works exclusively for bot users
-* No more red error messages
+* No more scary error messages
