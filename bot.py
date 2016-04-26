@@ -305,10 +305,9 @@ def versioninfo(channel):
     #This might work. Probably.
     sourcetemp = open("bot.py", "r")
     currentcode = sourcetemp.read()
-    print(currentcode)
-    if currentcode == requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py'):
+    if currentcode == requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py').text:
         yield from client.send_message(channel, "This bot instance is up to date with the latest stable build.")
-    elif currentcode == requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py'):
+    elif currentcode == requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py').text:
         yield from client.send_message(channel, "This bot instance is up to date with the latest unstable build.")
     else:
         yield from client.send_message(channel, "This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
