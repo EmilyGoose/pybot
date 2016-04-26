@@ -8,62 +8,63 @@ This is still very unstable, so if you would like to make a pull request, please
 ## Breaking changes
 Pybot now requires the async branch of discord.py and consequently Python >= 3.4
 
-Incompatible with mere mortal user accounts, must register for a bot account.
+Incompatible with user accounts, the bot must run on a bot account.
+If that's too much hassle for you, [click here](http://bit.ly/getpybot) to rely on our running instance of the bot.
 
 ## Usage
+Note: All commands must be prefaced with "@pybot"
 
-### @pybot idea: \<text\>
+### idea: \<text\>
 
 Enters an idea. Make sure there is a space after the colon
 
+### getideas \<name\>
 
-### @pybot getideas \<name\>
-
-Gets an idea. Must be a name, not an @mention. Omit the name parameter to get your own ideas
+Gets an idea. Must be a name, not an @mention. Omit the name parameter to get your own ideas.
 
 
-### @pybot delidea \<*n*\>
+### delidea \<*n*\>
 
 Deletes the *n* th idea in your list of ideas. It is recommended to call !getideas first.
 
-### @pybot clearideas
+### clearideas
 
 Deletes ALL your ideas. Use with caution.
 
-### @pybot machineinfo
+### machineinfo
 
 Displays information about the machine running the bot
 
-### @pybot splitchannel
+### splitchannel
 
 Keeps future ideas from channel separate and private to the channel
 
-### @pybot mergechannel
+### mergechannel
 
 Makes ideas from channel available to other channels
 
-### @pybot setresponse "\<*response*\>" for "\<*call*\>"
+### setresponse "\<*response*\>" for "\<*call*\>"
 
 Has pybot respond with *response* whenever a message matches *call*
 
-### @pybot delresponse \<*call*\>
+### delresponse \<*call*\>
 
 Deletes response for *call*
 
-### @pybot getresponses
+### getresponses
 
 Gets all responses
 
-### @pybot clearresponses
+### clearresponses
 
-Deletes ALL responses.
+Deletes ALL responses
 
-### @pybot getout
+### getout
 
 Pybot leaves the server :(
 (Only the owner can use this)
 
-### @pybot help
+### help
 
 Displays version info and a list of commands
 
