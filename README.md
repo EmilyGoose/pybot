@@ -7,6 +7,7 @@ This is still very unstable, so if you would like to make a pull request, please
 
 ## Breaking changes
 Pybot now requires the async branch of discord.py and consequently Python >= 3.4
+
 Incompatible with mere mortal user accounts, must register for a bot account.
 
 ## Usage
@@ -55,7 +56,7 @@ Gets all responses
 
 ### @pybot clearresponses
 
-Has pybot respond with *response* whenever a message matches *call*
+Deletes ALL responses.
 
 ### @pybot help
 
@@ -64,21 +65,22 @@ Displays version info and a list of commands
 ## Setup instructions
 
 Install Python >= 3.4
-Install the async branch of discord.py(https://github.com/Rapptz/discord.py/tree/async)
-You can do this through pip if you have git installed:
+
+Install the async branch of [discord.py](https://github.com/Rapptz/discord.py/tree/async). You can do this through pip if you have git installed:
 ```
 pip install git+https://github.com/Rapptz/discord.py@async
 ```
 Set up a Discord bot user
-Place bot.py in whichever folder you want it to run in. Note that it creates multiple text files, so putting it in a folder would be recommended.
+
+Place bot.py in whichever folder you want it to run in.
+
 Create a file named "cfg.py" in the same folder. The file should look like this:
 
 ```Python
 TOKEN = "<redacted>"
 DEBUGMODE = False #Or True if you REALLY want
-DEBUGCH = "<channel id>"
-BOTID = "<bot Discord ID used in @mentions>"
-BOTNAME = "<bot username>"
+DEBUGCH = "<channel id>" #Isn't entirely necessary if DEBUGMODE is False
+ADMINROLE = "<role id>" #Role of people who can kill the bot
 ```
 
 ## New since v5.0
