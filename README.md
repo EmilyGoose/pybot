@@ -72,7 +72,8 @@ Displays version info and a list of commands
 ## Setup instructions
 
 *NOTE: If you would like to add pybot to your server [click here](http://bit.ly/addpybot) instead.*
-Unless you REALLY want to, you can rely on the instance run by me.
+
+Unless you REALLY want to run your own bot, you can rely on the instance run by me.
 
 Install Python >= 3.4
 
