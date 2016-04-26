@@ -75,26 +75,35 @@ Displays version info and a list of commands
 
 Unless you REALLY want to run your own bot, you can rely on the instance run by me.
 
-Install Python >= 3.4
 
-Install the async branch of [discord.py](https://github.com/Rapptz/discord.py/tree/async). You can do this through pip if you have git installed:
+1. Install Python >= 3.4
+
+2. Install the async branch of [discord.py](https://github.com/Rapptz/discord.py/tree/async). You can do this through pip if you have git installed:
 ```
 pip install git+https://github.com/Rapptz/discord.py@async
 ```
-Set up a Discord bot user
+3. Set up a Discord bot user (Not a regular user. To set up a bot user [click here](https://discordapp.com/developers/applications/me))
 
-Place bot.py in whichever folder you want it to run in.
+4. Place bot.py in whichever folder you want it to run in.
 
-Create a file named "cfg.py" in the same folder. The file should look like this:
+5. Create a file named "cfg.py" in the same folder. The file should look like this:
 
 ```Python
 TOKEN = "<redacted>"
 DEBUGMODE = False #Or True if you REALLY want
 DEBUGCH = "<channel id>" #Isn't entirely necessary if DEBUGMODE is False
-ADMINROLE = "<role id>" #Role of people who can kill the bot
+KILLERIDS = "<ids>" #Table of people who can force quit the bot
 ```
 
+6. Run the bot! (If you get errors you probably didn't properly set up cfg.py)
+
 ## New since v5.0
+
+### Features
+
+* Support for separate servers
+* Splitting channel data from the rest of the server
+* Responses
 
 ### Commands
 
