@@ -243,6 +243,7 @@ def setreminder():
     #Nicholas why is this here
     #I'll just keep adding comments every update until you fix this
     #Nicholas, what is this function doing in my code
+    #Aaaand he still hasn't fixed it.
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -301,19 +302,24 @@ def clearresponses(channel):
 
 @asyncio.coroutine
 def versioninfo(channel):
-    #UNFINISHED
+    #This might work. Probably.
     sourcecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py')
     currentcode = open("bot.py", "r")
     if sourcecode == currentcode:
-        pass
+        client.send_message(channel, "This bot is running the latest stable version.")
+        return
+    sourcecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py')
+    if sourcecode == currentcode:
+        client.send_message(channel, "This bot is running the latest unstable build.")
     else:
-        client.send_message(channel, "placeholder")
-    
+        client.send_message(channel, "This bot is not running an up-to-date version! Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
+        
 @asyncio.coroutine
 def processcommand(rawstring, channel, user):
     #Process the user's commands
     if " " in rawstring:
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
+        cmd = cmd.lower()
         if cmd == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         elif cmd == "idea" or cmd == "idea:":
@@ -340,6 +346,7 @@ def processcommand(rawstring, channel, user):
         else:
             yield from client.send_message(channel, "Unknown command. Please try again.")
     else:
+        rawstring = rawstring.lower()
         if rawstring == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         if rawstring == "die":
@@ -368,8 +375,8 @@ def processcommand(rawstring, channel, user):
         elif rawstring == "mergechannel":
             yield from mergechannel(channel)
         elif rawstring == "versioninfo":
-            #yield from versioninfo(channel)
-            pass
+            yield from versioninfo(channel)
+            #pass
         else:
             yield from client.send_message(channel, "Unknown command. Please try again.")
 
