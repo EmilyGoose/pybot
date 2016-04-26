@@ -31,7 +31,15 @@ http://github.com/MishaLarionov/pybot/tree/discord\n
 `@pybot getresponses` Gets all automated responses
 `@pybot delresponse <call>` Deletes the response for call
 `@pybot clearresponses` Deletes ALL responses
+`@pybot getout` Makes pybot leave the server. Only usable by the owner.
 """
+
+#People that are allowed to kill the bot
+killerids = cfg.KILLERIDS
+
+#Get the bot's ID
+
+print("Setup finished")
 
 def readfile(channel):
     #Function for grabbing the dictionary from the file
@@ -302,8 +310,7 @@ def clearresponses(channel):
 
 @asyncio.coroutine
 def versioninfo(channel):
-    #This might work. Probably.
-    #It doesn't work even though logically it should
+    #Basically looks at itself and compares itself with the github
     sourcetemp = open("bot.py", "r")
     currentcode = sourcetemp.read()
     stablecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py')
@@ -354,11 +361,13 @@ def processcommand(rawstring, channel, user):
         if rawstring == "die":
             try:
                 print(user.name + " tried to kill the bot!")
-                if any(cfg.ADMINROLE == role.id for role in user.roles):
+                if user.id in killerids:
                     #The above if statement doesn't work
                     yield from client.send_message(channel, "brb dying")
                     print(user.name + " has killed me! Avenge me!") 
                     yield from client.logout()
+                else:
+                    yield from client.send_message(channel, "You don't have permission to kill me! If you really hate me, get your channel owner to send `@pybot getout`.")
             except:
                 yield from client.send_message(channel, "You need to be in a server to kill me.")
         elif rawstring == "clearideas":
@@ -379,7 +388,12 @@ def processcommand(rawstring, channel, user):
             yield from mergechannel(channel)
         elif rawstring == "versioninfo":
             yield from versioninfo(channel)
-            #pass
+        elif rawstring == "getout":
+            if user == channel.server.owner:
+                yield from client.send_message(channel, "Alright, I'll leave your server.. :cry:\n(http://bit.ly/addpybot to re-add me)")
+                yield from client.leave_server(channel.server)
+            else:
+                yield from client.send_message(channel, "Only the server owner can make me leave!")
         else:
             yield from client.send_message(channel, "Unknown command. Please try again.")
 
@@ -409,6 +423,7 @@ def on_message(message):
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name + " says: " + message.content)
     if message.author == client.user:
         return
+    #Uncomment this if you want to use an exclamaion mark instead of @pybot
     #if message.content.startswith("!") and len(message.content) > 1:
         #yield from processcommand(message.content[1:], message.channel, message.author)
     if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
