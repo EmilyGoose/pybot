@@ -3,8 +3,7 @@
 #github.com/MishaLarionov/pybot/tree/discord-unstable
 
 #TODO:
-#Support multiple servers from one bot instance (Basically more .txt files)
-#Add todo command (Literally just a clone/rename of ideas)
+#Move responses into a separate .py file
 
 print("Loading... (This may take a while)")
 
@@ -17,7 +16,7 @@ import asyncio, discord, requests, dateparser
 client = discord.Client()
 
 #Initialize help string
-helpstring = """PYBOT V5 HELP
+helpString = """PYBOT V5 HELP
 http://github.com/MishaLarionov/pybot/tree/discord\n
 `@pybot help` shows this page
 `@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas
@@ -250,6 +249,8 @@ def setreminder():
     #Aaaand he still hasn't fixed it.
     #Nicholas do you ever comment your code
     #I bet I could remove this whole function and the bot will run
+    #Still more comments and he hasn't noticed
+    #Nicholas will you please comment or remove this code
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -349,7 +350,7 @@ def processcommand(rawstring, channel, user):
             print("Reminder code doesn't exist yet, please create some.")
             yield from client.send_message(channel, "Remind command has not been migrated to new format.")
         elif cmd == "help":
-            yield from client.send_message(channel, helpstring)
+            yield from client.send_message(channel, helpString)
         elif cmd == "setresponse":
             try:
                 yield from setresponse(message.split("\"")[1], message.split("\"")[3], channel)
@@ -376,7 +377,7 @@ def processcommand(rawstring, channel, user):
         elif rawstring == "machineinfo":
             yield from client.send_message(channel, platform.node() + " " + platform.platform())
         elif rawstring == "help":
-            yield from client.send_message(channel, helpstring)
+            yield from client.send_message(channel, helpString)
         elif rawstring == "getideas":
             yield from getideas(user.name, channel)
         elif rawstring == "getresponses":
