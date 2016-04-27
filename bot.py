@@ -34,11 +34,6 @@ http://github.com/MishaLarionov/pybot/tree/discord\n
 `@pybot getout` Makes pybot leave the server. Only usable by the owner.
 """
 
-#People that are allowed to kill the bot
-killerids = cfg.KILLERIDS
-
-#Get the bot's ID
-
 print("Setup finished")
 
 def readfile(channel):
@@ -359,17 +354,13 @@ def processcommand(rawstring, channel, user):
         if rawstring == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         if rawstring == "die":
-            try:
-                print(user.name + " tried to kill the bot!")
-                if user.id in killerids:
-                    #The above if statement doesn't work
-                    yield from client.send_message(channel, "brb dying")
-                    print(user.name + " has killed me! Avenge me!") 
-                    yield from client.logout()
-                else:
-                    yield from client.send_message(channel, "You don't have permission to kill me! If you really hate me, get your channel owner to send `@pybot getout`.")
-            except:
-                yield from client.send_message(channel, "You need to be in a server to kill me.")
+            print(user.name + " tried to kill the bot!")
+            if user.id in cfg.KILLERIDS:
+                yield from client.send_message(channel, "brb dying")
+                print(user.name + " has killed me! Avenge me!") 
+                sys.exit()
+            else:
+                yield from client.send_message(channel, "You don't have permission to kill me! If you really hate me, get your channel owner to send `@pybot getout`.")
         elif rawstring == "clearideas":
             yield from clearideas(user, channel)
         elif rawstring == "machineinfo":
