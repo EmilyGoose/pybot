@@ -115,24 +115,10 @@ def newIdea(text, user, channel):
 
 @asyncio.coroutine
 def getIdeas(name, channel):
-    mentions = []
-    userNames = []
-    userIDs = []
-    #Make the user lists
-    try:
-        for member in channel.server.members:
-            mentions.append(member.mention)
-            userNames.append(member.name.lower())
-            userIDs.append(member.id)
-    except AttributeError:
-        mentions.append(channel.user.mention)
-        userNames.append(channel.user.name.lower())
-        userIDs.append(channel.user.id)
     #Check if the user exists
-    if name.lower() in userNames:
-        #Put all this in a function eventually maybe?
-        userpos = userNames.index(name.lower())
-        userID = userIDs[userpos]
+    user = channel.server.get_member_named(name)
+    if user:
+        userID = user.id
         #Grab the dictionary from the text file
         d = readFile(channel)
         #Check if the user is in the idea dictionary
@@ -140,15 +126,15 @@ def getIdeas(name, channel):
             #Check if the user has any ideas
             if len(d[userID]) > 0:
                 #Output a numbered list of the user's ideas
-                s = ("Ideas for " + mentions[userpos] + ":")
+                s = ("Ideas for {}:".format(user.mention))
                 for i in range(0, len(d[userID])):
                     s = (s + ("\n`" + str(i+1) + ":` " + d[userID][i]))
                 yield from client.send_message(channel, s)
                 #Begin descending staircase of error messages
             else:
-                yield from client.send_message(channel, mentions[userpos] + " has not entered any ideas yet!")
+                yield from client.send_message(channel, user.mention + " has not entered any ideas yet!")
         else:
-            yield from client.send_message(channel, mentions[userpos] + " has not entered any ideas yet!")
+            yield from client.send_message(channel, user.mention + " has not entered any ideas yet!")
     else:
         yield from client.send_message(channel, "Name not found! Please try again!")
 
@@ -251,7 +237,9 @@ def setReminder():
     #I bet I could remove this whole function and the bot will run
     #Still more comments and he hasn't noticed
     #Nicholas will you please comment or remove this code
-    #Like seriously none of this works please help
+    #Like seriously none of this code is ever run
+    #FIX PENCILCASE
+    #Why is this still here
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -367,6 +355,7 @@ def processCommand(rawstring, channel, user):
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         if rawstring == "die":
             print(user.name + " tried to kill the bot!")
+            #Find the people that are allowed to kill the bot
             if user.id in cfg.KILLERIDS:
                 yield from client.send_message(channel, "brb dying")
                 print(user.name + " has killed me! Avenge me!") 
