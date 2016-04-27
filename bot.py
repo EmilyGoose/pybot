@@ -1,9 +1,11 @@
-#Pybot discord-unstable build
-#Misha Larionov and Nicholas Carr
-#github.com/MishaLarionov/pybot/tree/discord-unstable
+# Pybot discord-unstable build
+# Misha Larionov and Nicholas Carr
+# github.com/MishaLarionov/pybot/tree/discord-unstable
+# Licensed under MIT License
+# See license.txt for full license
 
-#TODO:
-#Move responses into a separate .py file
+# TODO:
+# Move responses into a separate .py file
 
 print("Loading... (This may take a while)")
 
