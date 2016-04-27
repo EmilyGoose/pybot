@@ -61,12 +61,12 @@ def readfile(channel):
         except:
             try:
                 #Create a new file if <server>.txt doesn't exist
-                #Or if an error happens. Possibly fixed.
+                #Or if an error happens. (99% sure this is fixed)
                 f = open("data/" + channel.server.id + ".txt", 'w')
                 f.write("responses|{}")
             except:
                 #Create a new file if the channel doesn't exist or belong to a server
-                #Or if an error happens. Possibly fixed.
+                #Or if an error happens. (99% sure this is fixed)
                 f = open("data/" + channel.id + ".txt", 'w')
                 f.write("responses|{}")
     f.close()
@@ -105,6 +105,7 @@ def newidea(text, user, channel):
             d[user.id] = [text]
         writedict(d, channel)
         if readfile(channel) == {}:
+            #Revert the file if an error wiped it
             yield from debug("Something wiped the file. Restoring to previous version...")
             writedict(dprotect, channel)
     except Exception as e:
@@ -118,7 +119,7 @@ def getideas(name, channel):
     mentions = []
     userNames = []
     userIDs = []
-    #This is insecure and needs to be changed
+    #Make the user lists
     try:
         for member in channel.server.members:
             mentions.append(member.mention)
@@ -247,6 +248,8 @@ def setreminder():
     #I'll just keep adding comments every update until you fix this
     #Nicholas, what is this function doing in my code
     #Aaaand he still hasn't fixed it.
+    #Nicholas do you ever comment your code
+    #I bet I could remove this whole function and the bot will run
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -258,6 +261,7 @@ def setreminder():
 @asyncio.coroutine
 def setresponse(response, call, channel):
     d = readfile(channel)
+    #No idea what this regex does, Nicholas needs to comment this
     call = re.sub('([.,!?()])', r' \1 ', call)
     if call in d["responses"]:
         oldresponse = d["responses"][call]
@@ -272,6 +276,7 @@ def setresponse(response, call, channel):
 @asyncio.coroutine
 def delresponse(call, channel):
     d = readfile(channel)
+    #No idea what this regex does, Nicholas needs to comment this
     call = re.sub('([.,!?()])', r' \1 ', call)
     if call in d["responses"]:
         del(d["responses"][call])
@@ -296,7 +301,9 @@ def getresponses(channel):
 @asyncio.coroutine
 def clearresponses(channel):
     d = readfile(channel)
+    #Make sure there are responses to clear
     if len(d["responses"]) > 0:
+        #Bushwhack all the responses
         d["responses"] = {}
         writedict(d, channel)
         yield from client.send_message(channel, "Removed responses.")
@@ -307,9 +314,12 @@ def clearresponses(channel):
 def versioninfo(channel):
     #Basically looks at itself and compares itself with the github
     sourcetemp = open("bot.py", "r")
+    #Look at own code
     currentcode = sourcetemp.read()
+    #Load code from GitHub for stable and unstable branches
     stablecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord/bot.py')
     unstablecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py')
+    #Compare both code samples
     if currentcode == stablecode.text:
         yield from client.send_message(channel, "This bot instance is up to date with the latest stable build.")
     elif currentcode == unstablecode.text:
