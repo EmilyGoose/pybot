@@ -35,7 +35,7 @@ http://github.com/MishaLarionov/pybot/tree/discord\n
 
 print("Setup finished")
 
-def readfile(channel):
+def readFile(channel):
     #Function for grabbing the dictionary from the file
     d = {"responses": {}}
     try:
@@ -71,7 +71,7 @@ def readfile(channel):
     f.close()
     return(d)
 
-def writedict(d, channel):
+def writeDict(d, channel):
     #Function to write the dictionary to the file
     s = ""
     #Get the keys to match them with index numbers
@@ -89,32 +89,32 @@ def writedict(d, channel):
     return()
 
 @asyncio.coroutine
-def newidea(text, user, channel):
+def newIdea(text, user, channel):
     #Function to add idea for the user
     try:
         #Grab the dictionary from the file
-        d = readfile(channel)
+        d = readFile(channel)
         #Create a backup in case something happens
-        dprotect = readfile(channel)
+        dProtect = readFile(channel)
         try:
             #Add the idea to the user's list of ideas
             d[user.id].append(text)
         except:
             #Create the user in the dictionary if they don't exist
             d[user.id] = [text]
-        writedict(d, channel)
-        if readfile(channel) == {}:
+        writeDict(d, channel)
+        if readFile(channel) == {}:
             #Revert the file if an error wiped it
             yield from debug("Something wiped the file. Restoring to previous version...")
-            writedict(dprotect, channel)
+            writeDict(dProtect, channel)
     except Exception as e:
         yield from client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
-        writedict(dprotect)
+        writeDict(dProtect)
     else:
         yield from client.send_message(channel, "{}'s idea has been added.".format(user.mention))
 
 @asyncio.coroutine
-def getideas(name, channel):
+def getIdeas(name, channel):
     mentions = []
     userNames = []
     userIDs = []
@@ -134,7 +134,7 @@ def getideas(name, channel):
         userpos = userNames.index(name.lower())
         userID = userIDs[userpos]
         #Grab the dictionary from the text file
-        d = readfile(channel)
+        d = readFile(channel)
         #Check if the user is in the idea dictionary
         if userID in d:
             #Check if the user has any ideas
@@ -153,14 +153,14 @@ def getideas(name, channel):
         yield from client.send_message(channel, "Name not found! Please try again!")
 
 @asyncio.coroutine
-def delidea(num, author, channel):
+def delIdea(num, author, channel):
     try:
         #Makes sure "1" points to d[userID][0]
         num = int(num) - 1
         if num < 0:
             num = num + 1
         #Grab the dictionary from the text file
-        d = readfile(channel)
+        d = readFile(channel)
         #Make sure the number is not greater than the amount of elements
         if (num + 1) > len(d[author]) and len(d[author]) > 0:
             client.send_message(channel, "That's more ideas than you have! You currently have " + str(len(d[author])) + " ideas entered.")
@@ -170,13 +170,13 @@ def delidea(num, author, channel):
             #Get rid of the element
             e = d[author].pop(num)
             #Rebuild the dictionary
-            writedict(d, channel)
+            writeDict(d, channel)
             yield from client.send_message(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
     except:
         yield from client.send_message(channel, "Invalid number. Please try again.")
 
 @asyncio.coroutine
-def splitchannel(channel):
+def splitChannel(channel):
     #Overwrite the file with the new content
     try:
         f = open("data/" + channel.id + ".txt", 'r')
@@ -190,7 +190,7 @@ def splitchannel(channel):
     return()
 
 @asyncio.coroutine
-def mergechannel(channel):
+def mergeChannel(channel):
     #Overwrite the file with the new content
     try:
         f = open("data/" + channel.id + ".txt", 'r')
@@ -200,9 +200,9 @@ def mergechannel(channel):
     else:
         try:
             server = channel.server.id
-            d1 = readfile(channel)
+            d1 = readFile(channel)
             os.remove("data/" + channel.id + ".txt")
-            d2 = readfile(channel)
+            d2 = readFile(channel)
             s = ""
             #Get the keys to match them with index numbers
             keys = list(d1.keys()) + list(d2.keys())
@@ -229,18 +229,18 @@ def mergechannel(channel):
     return()
 
 @asyncio.coroutine
-def clearideas(author, channel):
+def clearIdeas(author, channel):
     #Grab the dictionary from the text file
-    d = readfile(channel)
+    d = readFile(channel)
     if len(d[author.id]) == 0:
         yield from client.send_message(channel, "You don't have any ideas to delete!")
     else:
         d[author.id] = []
-        writedict(d, channel)
+        writeDict(d, channel)
         yield from client.send_message(channel, "Ideas for {} cleared.".format(author.mention))
     
 
-def setreminder():
+def setReminder():
     #Nicholas's uncommented reminder code
     #I don't even think this function is ever called
     #Nicholas why is this here
@@ -251,6 +251,7 @@ def setreminder():
     #I bet I could remove this whole function and the bot will run
     #Still more comments and he hasn't noticed
     #Nicholas will you please comment or remove this code
+    #Like seriously none of this works please help
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -260,35 +261,35 @@ def setreminder():
     s.run()
 
 @asyncio.coroutine
-def setresponse(response, call, channel):
-    d = readfile(channel)
+def setResponse(response, call, channel):
+    d = readFile(channel)
     #No idea what this regex does, Nicholas needs to comment this
     call = re.sub('([.,!?()])', r' \1 ', call)
     if call in d["responses"]:
         oldresponse = d["responses"][call]
         d["responses"][call] = response
-        writedict(d, channel)
+        writeDict(d, channel)
         yield from client.send_message(channel, "Changed response from `" + oldresponse + "` to `" + response + "`.")
     else:
         d["responses"][call] = response
-        writedict(d, channel)
+        writeDict(d, channel)
         yield from client.send_message(channel, "Added response to list")
 
 @asyncio.coroutine
-def delresponse(call, channel):
-    d = readfile(channel)
+def delResponse(call, channel):
+    d = readFile(channel)
     #No idea what this regex does, Nicholas needs to comment this
     call = re.sub('([.,!?()])', r' \1 ', call)
     if call in d["responses"]:
         del(d["responses"][call])
-        writedict(d, channel)
+        writeDict(d, channel)
         yield from client.send_message(channel, "Removed response.")
     else:
         yield from client.send_message(channel, "I don't respond to that!")
 
 @asyncio.coroutine
-def getresponses(channel):
-    d = readfile(channel)
+def getResponses(channel):
+    d = readFile(channel)
     #Check if there are any responses
     if d["responses"]:
         #Output a numbered list of the user's ideas
@@ -300,19 +301,19 @@ def getresponses(channel):
         yield from client.send_message(channel, "There are no responses here!")
 
 @asyncio.coroutine
-def clearresponses(channel):
-    d = readfile(channel)
+def clearResponses(channel):
+    d = readFile(channel)
     #Make sure there are responses to clear
     if len(d["responses"]) > 0:
         #Bushwhack all the responses
         d["responses"] = {}
-        writedict(d, channel)
+        writeDict(d, channel)
         yield from client.send_message(channel, "Removed responses.")
     else:
         yield from client.send_message(channel, "There are no responses here!")
 
 @asyncio.coroutine
-def versioninfo(channel):
+def versionInfo(channel):
     #Basically looks at itself and compares itself with the github
     sourcetemp = open("bot.py", "r")
     #Look at own code
@@ -330,7 +331,7 @@ def versioninfo(channel):
     
     
 @asyncio.coroutine
-def processcommand(rawstring, channel, user):
+def processCommand(rawstring, channel, user):
     #Process the user's commands
     if " " in rawstring:
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
@@ -338,13 +339,13 @@ def processcommand(rawstring, channel, user):
         if cmd == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
         elif cmd == "idea" or cmd == "idea:":
-            yield from newidea(message, user, channel)
+            yield from newIdea(message, user, channel)
         elif cmd == "getideas":
-            yield from getideas(message, channel)
+            yield from getIdeas(message, channel)
         elif cmd == "delidea":
-            yield from delidea(message, user.id, channel)
+            yield from delIdea(message, user.id, channel)
         elif cmd == "clearideas":
-            yield from clearideas(user, channel)
+            yield from clearIdeas(user, channel)
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
@@ -353,11 +354,11 @@ def processcommand(rawstring, channel, user):
             yield from client.send_message(channel, helpString)
         elif cmd == "setresponse":
             try:
-                yield from setresponse(message.split("\"")[1], message.split("\"")[3], channel)
+                yield from setResponse(message.split("\"")[1], message.split("\"")[3], channel)
             except IndexError:
                 yield from client.send_message(channel, "Improper syntax! For me to understand responses with spaces, please put your call and response in double quotes.")
         elif cmd == "delresponse":
-            yield from delresponse(message, channel)
+            yield from delResponse(message, channel)
         else:
             yield from client.send_message(channel, "Unknown command. Please try again.")
     else:
@@ -373,23 +374,23 @@ def processcommand(rawstring, channel, user):
             else:
                 yield from client.send_message(channel, "You don't have permission to kill me! If you really hate me, get your channel owner to send `@pybot getout`.")
         elif rawstring == "clearideas":
-            yield from clearideas(user, channel)
+            yield from clearIdeas(user, channel)
         elif rawstring == "machineinfo":
             yield from client.send_message(channel, platform.node() + " " + platform.platform())
         elif rawstring == "help":
             yield from client.send_message(channel, helpString)
         elif rawstring == "getideas":
-            yield from getideas(user.name, channel)
+            yield from getIdeas(user.name, channel)
         elif rawstring == "getresponses":
-            yield from getresponses(channel)
+            yield from getResponses(channel)
         elif rawstring == "clearresponses":
-            yield from clearresponses(channel)
+            yield from clearResponses(channel)
         elif rawstring == "splitchannel":
-            yield from splitchannel(channel)
+            yield from splitChannel(channel)
         elif rawstring == "mergechannel":
-            yield from mergechannel(channel)
+            yield from mergeChannel(channel)
         elif rawstring == "versioninfo":
-            yield from versioninfo(channel)
+            yield from versionInfo(channel)
         elif rawstring == "getout":
             if user == channel.server.owner:
                 yield from client.send_message(channel, "Alright, I'll leave your server.. :cry:\n(http://bit.ly/addpybot to re-add me)")
@@ -411,11 +412,11 @@ def debug(text):
         yield from client.send_message(debug, text)
 
 @asyncio.coroutine
-def processresponse(message):
-    for word in readfile(message.channel)["responses"]:
+def processResponse(message):
+    for word in readFile(message.channel)["responses"]:
         #Pad and sub to ensure only whole words are matched and punctuation doesn't stop matches
         if (" " + word + " ") in re.sub('([.,!?()])', r' \1 ', " " + message.content + " "):
-            yield from client.send_message(message.channel, readfile(message.channel)["responses"][word])
+            yield from client.send_message(message.channel, readFile(message.channel)["responses"][word])
             return True
     return False
 
@@ -427,17 +428,17 @@ def on_message(message):
         return
     #Uncomment this if you want to use an exclamaion mark instead of @pybot
     #if message.content.startswith("!") and len(message.content) > 1:
-        #yield from processcommand(message.content[1:], message.channel, message.author)
+        #yield from processCommand(message.content[1:], message.channel, message.author)
     if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
-        yield from processcommand(str.strip(message.content[22:]), message.channel, message.author)
+        yield from processCommand(str.strip(message.content[22:]), message.channel, message.author)
     if message.content.startswith("@" + client.user.name) and len(message.content) > 7:
-        yield from processcommand(str.strip(message.content[7:]), message.channel, message.author)
+        yield from processCommand(str.strip(message.content[7:]), message.channel, message.author)
     elif message.content == "<@" + client.user.id + ">":
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
     elif message.content == "@" + client.user.name:
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
     else:
-        yield from processresponse(message)
+        yield from processResponse(message)
 @client.event
 @asyncio.coroutine
 def on_ready():
