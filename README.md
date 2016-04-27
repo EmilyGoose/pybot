@@ -90,8 +90,6 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
 
 ```Python
 TOKEN = "<redacted>"
-DEBUGMODE = False #Or True if you REALLY want
-DEBUGCH = "<channel id>" #Isn't entirely necessary if DEBUGMODE is False
 KILLERIDS = "<ids>" #Table of people who can force quit the bot
 ```
 
