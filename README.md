@@ -84,7 +84,7 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
 
    `pip install git+https://github.com/Rapptz/discord.py@async`
 
-3. Install the following libraries (`pip install <name>`):
+3. Install the following libraries (`pip install <name>`). Alternatively, run dependencyInstaller.py
 
   * asyncio
   * requests
