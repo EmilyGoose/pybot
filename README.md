@@ -78,18 +78,24 @@ Displays version info and a list of commands
 
 Unless you REALLY want to run your own bot, you can rely on the instance run by me.
 
-
 1. Install Python >= 3.4
 
 2. Install the async branch of [discord.py](https://github.com/Rapptz/discord.py/tree/async). You can do this through pip if you have git installed:
 
    `pip install git+https://github.com/Rapptz/discord.py@async`
 
-3. Set up a Discord bot user (Not a regular user. To set up a bot user [click here](https://discordapp.com/developers/applications/me))
+3. Install the following libraries (`pip install <name>`):
 
-4. Place bot.py in whichever folder you want it to run in.
+  * asyncio
+  * requests
+  * dateparser
+  * wikipedia
 
-5. Create a file named "cfg.py" in the same folder. The file should look like this:
+4. Set up a Discord bot user (Not a regular user. To set up a bot user [click here](https://discordapp.com/developers/applications/me))
+
+5. Place bot.py in whichever folder you want it to run in.
+
+6. Create a file named "cfg.py" in the same folder. The file should look like this:
 
 ```Python
 TOKEN = "<redacted>"
