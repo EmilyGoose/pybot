@@ -22,7 +22,6 @@ Enters an idea. Make sure there is a space after the colon
 
 Gets an idea. Must be a name, not an @mention. Omit the name parameter to get your own ideas.
 
-
 ### delidea \<*n*\>
 
 Deletes the *n* th idea in your list of ideas. It is recommended to call !getideas first.
@@ -30,6 +29,10 @@ Deletes the *n* th idea in your list of ideas. It is recommended to call !getide
 ### clearideas
 
 Deletes ALL your ideas. Use with caution.
+
+### whatis \<*query*\>
+
+Returns a summary of the Wikipedia page for *query*
 
 ### machineinfo
 
@@ -102,6 +105,7 @@ Now you're ready to run the bot! If you get any errors you've probably done some
 * Support for separate servers
 * Splitting channel data from the rest of the server
 * Responses
+* Wikipedia lookup
 
 ### Commands
 
@@ -113,6 +117,7 @@ Now you're ready to run the bot! If you get any errors you've probably done some
 * getresponses command
 * clearresponses command
 * getout command
+* whatis command
 
 ### Other
 
