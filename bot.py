@@ -12,7 +12,8 @@ print("Loading... (This may take a while)")
 #Import all the stuff
 import cfg, time, platform, ast, sys, os, re
 #Second line of import statements. These may need to be installed
-import asyncio, discord, requests, dateparser
+import asyncio, discord, requests, dateparser, wikipedia
+wikipedia.set_lang("en")
 
 #Client intialization stuff
 client = discord.Client()
@@ -22,9 +23,10 @@ helpString = """PYBOT V5 HELP
 http://github.com/MishaLarionov/pybot/tree/discord\n
 `@pybot help` shows this page
 `@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas
-`@pybot getideas <username>` lists ideas from user. *username* can be omitted to get your own ideas.
-`@pybot delidea <n>` deletes the idea with the number *n*
-`@pybot clearideas` deletes ALL your ideas
+`@pybot getideas <username>` Lists ideas from user. *username* can be omitted to get your own ideas.
+`@pybot delidea <n>` Deletes the idea with the number *n*
+`@pybot clearideas` Deletes ALL your ideas
+`@pybot whatis <query>` Gets a summary of the Wikipedia page for <query>
 `@pybot machineinfo` Gets server name and operating system
 `@pybot splitchannel` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run.
 `@pybot mergechannel` Makes ideas from channel available to all channels.
@@ -266,6 +268,20 @@ def setResponse(response, call, channel):
         yield from client.send_message(channel, "Added response to list")
 
 @asyncio.coroutine
+def whatIs(user, channel, message):
+    searchResults = wikipedia.search(message)
+    if len(searchResults) < 1:
+        yield from client.send_message(channel, "Could not find anything matching your search, {}. Try using different keywords.".format(user.mention))
+    else:
+        try:
+            page = wikipedia.page(searchResults[0], auto_suggest = True, redirect = True)
+            output = '{}, here you go:\n**'.format(user.mention) + page.title + "**\n`From " + page.url + "`\n" + wikipedia.summary(searchResults[0], sentences=1)
+            yield from client.send_message(channel, output)
+        except:
+            yield from client.send_message(channel, '{}, your search could refer to multiple pages. Try adding more keywords (Example: "Python" to "Python snake" or "Python language").'.format(user.mention))
+            
+
+@asyncio.coroutine
 def delResponse(call, channel):
     d = readFile(channel)
     #No idea what this regex does, Nicholas needs to comment this
@@ -336,10 +352,12 @@ def processCommand(rawstring, channel, user):
             yield from delIdea(message, user.id, channel)
         elif cmd == "clearideas":
             yield from clearIdeas(user, channel)
+        elif cmd == "whatis":
+            yield from whatIs(user, channel, message)
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
-            yield from client.send_message(channel, "Remind command has not been migrated to new format.")
+            yield from client.send_message(channel, "Nicholas (@ncarr) forgot to write this code.")
         elif cmd == "help":
             yield from client.send_message(channel, helpString)
         elif cmd == "setresponse":
