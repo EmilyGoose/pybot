@@ -15,7 +15,7 @@ for i in libraries:
 
 print("Trying to install Discord.py library")
 try:
-    pip.main(['install', git+https://github.com/Rapptz/discord.py@async])
+    pip.main(['install', 'git+https://github.com/Rapptz/discord.py@async'])
 except:
     print("Unable to install Discord library. This probably means git isn't installed. Try doing a manual install.")
 else:
