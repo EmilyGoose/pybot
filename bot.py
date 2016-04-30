@@ -231,19 +231,7 @@ def clearIdeas(author, channel):
     
 
 def setReminder():
-    #Nicholas's uncommented reminder code
-    #I don't even think this function is ever called
-    #Nicholas why is this here
-    #I'll just keep adding comments every update until you fix this
-    #Nicholas, what is this function doing in my code
-    #Aaaand he still hasn't fixed it.
-    #Nicholas do you ever comment your code
-    #I bet I could remove this whole function and the bot will run
-    #Still more comments and he hasn't noticed
-    #Nicholas will you please comment or remove this code
-    #Like seriously none of this code is ever run
-    #FIX PENCILCASE
-    #Why is this still here
+    #Unfinished reminder code
     event = message.content.split(" ", maxsplit = 1)[1]
     (name, datetime) = event.split("@", maxsplit = 1)
     name = name.strip()
@@ -275,10 +263,10 @@ def whatIs(user, channel, message):
     else:
         try:
             page = wikipedia.page(searchResults[0], auto_suggest = True, redirect = True)
-            output = '{}, here you go:\n**'.format(user.mention) + page.title + "**\n`From " + page.url + "`\n" + wikipedia.summary(searchResults[0], sentences=1)
+            output = '{}, here you go:\n**'.format(user.mention) + page.title + "**\nFrom <" + page.url + ">\n" + wikipedia.summary(searchResults[0], sentences=1)
             yield from client.send_message(channel, output)
-        except:
-            yield from client.send_message(channel, '{}, your search could refer to multiple pages. Try adding more keywords (Example: "Python" to "Python snake" or "Python language").'.format(user.mention))
+        except wikipedia.exceptions.DisambiguationError as e:
+            yield from client.send_message(channel, '{}, '.format(user.mention) + str(e))
             
 
 @asyncio.coroutine
