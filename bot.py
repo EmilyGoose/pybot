@@ -358,7 +358,7 @@ def getChanges(repo, lastCommit):
                             print(m)
                             print("drafting more of the message")
                         print("done commit loop")
-                        yield from client.send_message(cfg.GITHUBCHANNEL, m)
+                        yield from client.send_message(client.get_channel(cfg.GITHUBCHANNEL), m)
                         print("sent a message")
                         lastCommit = i.payload["head"]
                         if i.payload["head"] == repo.commit("discord-unstable").sha:
@@ -485,12 +485,4 @@ def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
     yield from getChanges(repo, lastCommit)
 
-#Make an event loop
-loop = asyncio.get_event_loop()
-#Create tasks to run concurrently
-tasks = [
-    asyncio.ensure_future(client.start(cfg.TOKEN))]
-#Run them
-loop.run_until_complete(asyncio.wait(tasks))
-#Close the loop after forever
-loop.close()
+client.run(cfg.TOKEN)
