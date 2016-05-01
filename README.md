@@ -7,6 +7,7 @@ This is still very unstable, so if you would like to make a pull request, please
 
 ## Breaking changes
 Pybot now requires the async branch of discord.py and consequently Python >= 3.4
+Pybot now requires github3.py and there is a new line you need to add to your cfg
 
 Incompatible with user accounts, the bot must run on a bot account.
 If that's too much hassle for you, [click here](http://bit.ly/getpybot) to rely on our running instance of the bot.
@@ -90,6 +91,7 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
   * requests
   * dateparser
   * wikipedia
+  * github3.py
 
 4. Set up a Discord bot user (Not a regular user. To set up a bot user [click here](https://discordapp.com/developers/applications/me))
 
@@ -100,35 +102,13 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
 ```Python
 TOKEN = "<redacted>"
 KILLERIDS = "<ids>" #Table of people who can force quit the bot
+GITHUBCHANNEL = "<channel id where you want GitHub notifications>"
 ```
 
 Now you're ready to run the bot! If you get any errors you've probably done something wrong in the config file.
 
-## New in 6.0
+## New since 6.0
 
 ### Features
 
-* Support for separate servers
-* Splitting channel data from the rest of the server
-* Responses
-* Wikipedia lookup
-
-### Commands
-
-* clearideas command
-* mergechannel command
-* splitchannel command
-* setresponse command
-* delresponse command
-* getresponses command
-* clearresponses command
-* getout command
-* whatis command
-
-### Other
-
-* Fixes to command processing
-* Fixes to help command
-* Compatibility with multiple servers
-* Now uses discord.py async branch and works exclusively for bot users
-* No more scary error messages
+* Preliminary GitHub notifications

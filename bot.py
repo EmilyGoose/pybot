@@ -12,8 +12,11 @@ print("Loading... (This may take a while)")
 #Import all the stuff
 import cfg, time, platform, ast, sys, os, re
 #Second line of import statements. These may need to be installed
-import asyncio, discord, requests, dateparser, wikipedia
+import asyncio, discord, requests, dateparser, wikipedia, github3
 wikipedia.set_lang("en")
+g = github3.GitHub()
+repo = github3.repository("MishaLarionov", "pybot")
+lastCommit = repo.commit("discord-unstable")
 
 #Client intialization stuff
 client = discord.Client()
@@ -322,8 +325,30 @@ def versionInfo(channel):
         yield from client.send_message(channel, "This bot instance is up to date with the latest unstable build.")
     else:
         yield from client.send_message(channel, "This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
-    
-    
+
+@asyncio.coroutine
+def getChanges(repo, lastCommit):
+    while True:
+        #Make sure we have the freshest data, but tell the server to give us nothing if our data is already fresh
+        repo.refresh(conditional=True)
+        if repo.commit("discord-unstable") != lastCommit:
+            events = repo.iter_events()
+            #Go through everything that ever happened on the repo to see what's new
+            for i in events:
+                #If we pushed some changes
+                if i.type == "PushEvent":
+                    #If our old commit came just before this change
+                    if i.before == lastCommit:
+                        m = "[" + repo.name + "] " + i.payload.size + "  new commits pushed by " + i.actor.login + "<" + repo.compare_commits(i.before, i.head).html_url + ">:\n"
+                        for c in i.payload.commits:
+                            m += "`" + c["sha"][:7] + "` " + c.message + " - " + c.author.name + " - <" + repo.commit(c.sha).html_url + ">\n"
+                        yield from client.send_message(cfg.GITHUBCHANNEL, m)
+                        lastCommit == i.head
+                        if i.head == repo.commit("discord-unstable"):
+                            break
+        print("Hi, hi, got your changes!")
+        yield from asyncio.sleep(120)
+
 @asyncio.coroutine
 def processCommand(rawstring, channel, user):
     #Process the user's commands
@@ -441,4 +466,13 @@ def on_message(message):
 def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
 
-client.run(cfg.TOKEN)
+#Make an event loop
+loop = asyncio.get_event_loop()
+#Create tasks to run concurrently
+tasks = [
+    asyncio.ensure_future(getChanges(repo, lastCommit)),
+    asyncio.ensure_future(client.start(cfg.TOKEN))]
+#Run them
+loop.run_until_complete(asyncio.wait(tasks))
+#Close the loop after forever
+loop.close()
