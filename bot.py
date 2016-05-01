@@ -329,42 +329,26 @@ def versionInfo(channel):
 @asyncio.coroutine
 def getChanges(repo, lastCommit):
     while True:
-        print("Starting check")
         #Make sure we have the freshest data, but tell the server to give us nothing if our data is already fresh
         repo.refresh(conditional=True)
-        print("Refreshed")
+        #If anything actually happened
         if repo.commit("discord-unstable") != lastCommit:
-            print("Ooh, discrepancies")
             events = repo.iter_events()
-            print("Investigating events")
             #Go through everything that ever happened on the repo to see what's new
             for i in events:
-                print("Reporting from for loop")
-                #If we pushed some changes
-                if i.type == "PushEvent":
-                    print("Someone pushed changes")
-                    print(i.payload["before"])
-                    print(lastCommit.sha)
-                    print(i.payload["before"] == lastCommit.sha)
-                    #If our old commit came just before this change
-                    if i.payload["before"] == lastCommit.sha:
-                        print("found the next commit")
-                        m = "[" + repo.name + "] " + str(i.payload["size"]) + "  new commit" + ("s" if i.payload["size"] != 1 else "") + " pushed by " + i.actor.login + " <" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
-                        print(m)
-                        print("Drafting a post")
-                        for c in i.payload["commits"]:
-                            print("in the commit loop")
-                            m += "`" + c["sha"][:7] + "` " + c["message"] + " - " + c["author"]["name"] + " - <" + repo.commit(c["sha"]).html_url + ">\n"
-                            print(m)
-                            print("drafting more of the message")
-                        print("done commit loop")
-                        yield from client.send_message(client.get_channel(cfg.GITHUBCHANNEL), m)
-                        print("sent a message")
-                        lastCommit = i.payload["head"]
-                        if i.payload["head"] == repo.commit("discord-unstable").sha:
-                            print("breaking")
-                            break
-        print("Hi, hi, got your changes!")
+                #If we pushed some changes and the old commit came in just before this change
+                if i.type == "PushEvent" and i.payload["before"] == lastCommit.sha:
+                    #Draft the beginning of the message
+                    m = "[" + repo.name + "] " + str(i.payload["size"]) + " new commit" + ("s" if i.payload["size"] != 1 else "") + " pushed by " + i.actor.login + " <" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
+                    for c in i.payload["commits"]:
+                        #Describe each new commit
+                        m += "`" + c["sha"][:7] + "` " + c["message"] + " - " + c["author"]["name"] + " - <" + repo.commit(c["sha"]).html_url + ">\n"
+                    yield from client.send_message(client.get_channel(cfg.GITHUBCHANNEL), m)
+                    #Update the last seen commit for later
+                    lastCommit = repo.commit(i.payload["head"])
+                    #If this is the last event which occured between updates
+                    if i.payload["head"] == repo.commit("discord-unstable").sha:
+                        break
         yield from asyncio.sleep(30)
 
 @asyncio.coroutine
