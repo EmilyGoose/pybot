@@ -349,7 +349,7 @@ def getChanges(repo, lastCommit):
                     #If our old commit came just before this change
                     if i.payload["before"] == lastCommit.sha:
                         print("found the next commit")
-                        m = "[" + repo.name + "] " + i.payload["size"] + "  new commits pushed by " + i.actor.login + "<" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
+                        m = "[" + repo.name + "] " + str(i.payload["size"]) + "  new commit" + ("s" if i.payload["size"] != 1 else "") + " pushed by " + i.actor.login + " <" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
                         print(m)
                         print("Drafting a post")
                         for c in i.payload["commits"]:
@@ -361,7 +361,7 @@ def getChanges(repo, lastCommit):
                         yield from client.send_message(cfg.GITHUBCHANNEL, m)
                         print("sent a message")
                         lastCommit = i.payload["head"]
-                        if i.payload["head"] == repo.commit("discord-unstable"):
+                        if i.payload["head"] == repo.commit("discord-unstable").sha:
                             print("breaking")
                             break
         print("Hi, hi, got your changes!")
