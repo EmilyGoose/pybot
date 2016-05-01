@@ -349,7 +349,7 @@ def getChanges(repo, lastCommit):
                     #If this is the last event which occured between updates
                     if i.payload["head"] == repo.commit("discord-unstable").sha:
                         break
-        yield from asyncio.sleep(30)
+        yield from asyncio.sleep(120)
 
 @asyncio.coroutine
 def processCommand(rawstring, channel, user):
