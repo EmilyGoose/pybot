@@ -1,5 +1,5 @@
 # Pybot
-Bot for Discord built in Python
+Bot for Slack built in Python by Misha Larionov, ported to Discord by Nicholas Carr
 
 This is a side project of mine, which hopefully will make it easy to keep track of ideas my team has for upcoming hackathons.
 Feel free to use the code, but please credit me (preferably via direct link to this repo). I try to comment it where possible.
@@ -104,7 +104,7 @@ KILLERIDS = "<ids>" #Table of people who can force quit the bot
 
 Now you're ready to run the bot! If you get any errors you've probably done something wrong in the config file.
 
-## New since v5.0
+## New in 6.0
 
 ### Features
 
