@@ -343,6 +343,9 @@ def getChanges(repo, lastCommit):
                 #If we pushed some changes
                 if i.type == "PushEvent":
                     print("Someone pushed changes")
+                    print(i.before)
+                    print(lastCommit.sha)
+                    print(i.before == lastCommit.sha)
                     #If our old commit came just before this change
                     if i.before == lastCommit.sha:
                         print("found the next commit")
