@@ -488,8 +488,8 @@ def on_ready():
 loop = asyncio.get_event_loop()
 #Create tasks to run concurrently
 tasks = [
-    asyncio.ensure_future(getChanges(repo, lastCommit)),
-    asyncio.ensure_future(client.start(cfg.TOKEN))]
+    asyncio.ensure_future(client.start(cfg.TOKEN)),
+    asyncio.ensure_future(getChanges(repo, lastCommit))]
 #Run them
 loop.run_until_complete(asyncio.wait(tasks))
 #Close the loop after forever
