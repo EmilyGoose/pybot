@@ -483,13 +483,13 @@ def on_message(message):
 @asyncio.coroutine
 def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
+    yield from getChanges(repo, lastCommit)
 
 #Make an event loop
 loop = asyncio.get_event_loop()
 #Create tasks to run concurrently
 tasks = [
-    asyncio.ensure_future(client.start(cfg.TOKEN)),
-    asyncio.ensure_future(getChanges(repo, lastCommit))]
+    asyncio.ensure_future(client.start(cfg.TOKEN))]
 #Run them
 loop.run_until_complete(asyncio.wait(tasks))
 #Close the loop after forever
