@@ -329,25 +329,40 @@ def versionInfo(channel):
 @asyncio.coroutine
 def getChanges(repo, lastCommit):
     while True:
+        print("Starting check")
         #Make sure we have the freshest data, but tell the server to give us nothing if our data is already fresh
         repo.refresh(conditional=True)
+        print("Refreshed")
         if repo.commit("discord-unstable") != lastCommit:
+            print("Ooh, discrepancies")
             events = repo.iter_events()
+            print("Investigating events")
             #Go through everything that ever happened on the repo to see what's new
             for i in events:
+                print("Reporting from for loop")
                 #If we pushed some changes
                 if i.type == "PushEvent":
+                    print("Someone pushed changes")
                     #If our old commit came just before this change
                     if i.before == lastCommit:
+                        print("found the next commit")
                         m = "[" + repo.name + "] " + i.payload.size + "  new commits pushed by " + i.actor.login + "<" + repo.compare_commits(i.before, i.head).html_url + ">:\n"
+                        print(m)
+                        print("Drafting a post")
                         for c in i.payload.commits:
+                            print("in the commit loop")
                             m += "`" + c["sha"][:7] + "` " + c.message + " - " + c.author.name + " - <" + repo.commit(c.sha).html_url + ">\n"
+                            print(m)
+                            print("drafting more of the message")
+                        print("done commit loop")
                         yield from client.send_message(cfg.GITHUBCHANNEL, m)
-                        lastCommit == i.head
+                        print("sent a message")
+                        lastCommit = i.head
                         if i.head == repo.commit("discord-unstable"):
+                            print("breaking")
                             break
         print("Hi, hi, got your changes!")
-        yield from asyncio.sleep(120)
+        yield from asyncio.sleep(30)
 
 @asyncio.coroutine
 def processCommand(rawstring, channel, user):
