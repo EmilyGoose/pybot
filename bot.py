@@ -343,25 +343,25 @@ def getChanges(repo, lastCommit):
                 #If we pushed some changes
                 if i.type == "PushEvent":
                     print("Someone pushed changes")
-                    print(i.payload.before)
+                    print(i.payload["before"])
                     print(lastCommit.sha)
-                    print(i.payload.before == lastCommit.sha)
+                    print(i.payload["before"] == lastCommit.sha)
                     #If our old commit came just before this change
-                    if i.payload.before == lastCommit.sha:
+                    if i.payload["before"] == lastCommit.sha:
                         print("found the next commit")
-                        m = "[" + repo.name + "] " + i.payload.size + "  new commits pushed by " + i.actor.login + "<" + repo.compare_commits(i.payload.before, i.payload.head).html_url + ">:\n"
+                        m = "[" + repo.name + "] " + i.payload["size"] + "  new commits pushed by " + i.actor.login + "<" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
                         print(m)
                         print("Drafting a post")
-                        for c in i.payload.commits:
+                        for c in i.payload["commits"]:
                             print("in the commit loop")
-                            m += "`" + c["sha"][:7] + "` " + c.message + " - " + c.author.name + " - <" + repo.commit(c.sha).html_url + ">\n"
+                            m += "`" + c["sha"][:7] + "` " + c["message"] + " - " + c["author"]["name"] + " - <" + repo.commit(c["sha"]).html_url + ">\n"
                             print(m)
                             print("drafting more of the message")
                         print("done commit loop")
                         yield from client.send_message(cfg.GITHUBCHANNEL, m)
                         print("sent a message")
-                        lastCommit = i.payload.head
-                        if i.payload.head == repo.commit("discord-unstable"):
+                        lastCommit = i.payload["head"]
+                        if i.payload["head"] == repo.commit("discord-unstable"):
                             print("breaking")
                             break
         print("Hi, hi, got your changes!")
