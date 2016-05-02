@@ -338,34 +338,25 @@ def getChanges(repos, lastCommits):
     while True:
         #Make sure we have the freshest data, but tell the server to give us nothing if our data is already fresh
         for repo in repos:
-            print("in repo")
             repo.refresh(conditional=True)
             for b in repo.iter_branches():
-                print("in branch")
                 #If anything actually happened
                 if b.commit != lastCommits[repo.id][b.name]:
-                    print("different last commit")
                     events = repo.iter_events()
                     #Go through everything that ever happened on the repo to see what's new
                     for i in events:
-                        print("in event")
                         #If we pushed some changes and the old commit came in just before this change
                         if i.type == "PushEvent" and i.payload["before"] == lastCommits[repo.id][b.name].sha:
                             #Draft the beginning of the message
                             m = "[" + repo.name + "] " + str(i.payload["size"]) + " new commit" + ("s" if i.payload["size"] != 1 else "") + " pushed by " + i.actor.login + " <" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
-                            print(m)
                             for c in i.payload["commits"]:
                                 #Describe each new commit
                                 m += "`" + c["sha"][:7] + "` " + c["message"] + " - " + c["author"]["name"] + " - <" + repo.commit(c["sha"]).html_url + ">\n"
-                                print(m)
                             yield from client.send_message(client.get_channel(cfg.GITHUBCHANNEL), m)
-                            print("sent")
                             #Update the last seen commit for later
                             lastCommits[repo.id][b.name] = repo.commit(i.payload["head"])
-                            print("updated last commit")
                             #If this is the last event which occured between updates
                             if i.payload["head"] == repo.commit("discord-unstable").sha:
-                                print("breaking")
                                 break
         yield from asyncio.sleep(120)
 
@@ -497,7 +488,6 @@ def on_message(message):
 def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
     if cfg.GITHUBCHANNEL and cfg.REPOS:
-        print("yielding")
         yield from getChanges(repos, lastCommits)
 
 client.run(cfg.TOKEN)
