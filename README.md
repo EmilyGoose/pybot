@@ -102,7 +102,8 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
 ```Python
 TOKEN = "<redacted>"
 KILLERIDS = "<ids>" #Table of people who can force quit the bot
-GITHUBCHANNEL = "<channel id where you want GitHub notifications>"
+GITHUBCHANNEL = "<channel id where you want GitHub notifications>" #Remove these last two lines to disable GitHub integration
+REPOS = [["owner", "repo"], ["MishaLarionov", "pybot"]] #One, none or many
 ```
 
 Now you're ready to run the bot! If you get any errors you've probably done something wrong in the config file.

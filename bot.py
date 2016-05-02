@@ -14,11 +14,16 @@ import cfg, time, platform, ast, sys, os, re
 #Second line of import statements. These may need to be installed
 import asyncio, discord, requests, dateparser, wikipedia, github3
 wikipedia.set_lang("en")
-g = github3.GitHub()
-repo = github3.repository("MishaLarionov", "pybot")
-lastCommits = {}
-for b in repo.iter_branches():
-    lastCommits[b.name] = b.commit
+if cfg.GITHUBCHANNEL and cfg.REPOS:
+    g = github3.GitHub()
+    repos = []
+    lastCommits = {}
+    for r in range(len(cfg.REPOS)):
+        repo = github3.repository(cfg.REPOS[r][0], cfg.REPOS[r][1])
+        repos.append(repo)
+        lastCommits[repo.id] = {}
+        for b in repos[r].iter_branches():
+            lastCommits[repo.id][b.name] = b.commit
 
 #Client intialization stuff
 client = discord.Client()
@@ -329,30 +334,31 @@ def versionInfo(channel):
         yield from client.send_message(channel, "This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
 
 @asyncio.coroutine
-def getChanges(repo, lastCommit):
+def getChanges(repos, lastCommits):
     while True:
         #Make sure we have the freshest data, but tell the server to give us nothing if our data is already fresh
-        repo.refresh(conditional=True)
-        for b in repo.iter_branches():
-            #If anything actually happened
-            if b.commit != lastCommits[b.name]:
-                events = repo.iter_events()
-                #Go through everything that ever happened on the repo to see what's new
-                for i in events:
-                    #If we pushed some changes and the old commit came in just before this change
-                    if i.type == "PushEvent" and i.payload["before"] == lastCommits[b.name].sha:
-                        #Draft the beginning of the message
-                        m = "[" + repo.name + "] " + str(i.payload["size"]) + " new commit" + ("s" if i.payload["size"] != 1 else "") + " pushed by " + i.actor.login + " <" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
-                        for c in i.payload["commits"]:
-                            #Describe each new commit
-                            m += "`" + c["sha"][:7] + "` " + c["message"] + " - " + c["author"]["name"] + " - <" + repo.commit(c["sha"]).html_url + ">\n"
-                        yield from client.send_message(client.get_channel(cfg.GITHUBCHANNEL), m)
-                        #Update the last seen commit for later
-                        lastCommits[b.name] = repo.commit(i.payload["head"])
-                        #If this is the last event which occured between updates
-                        if i.payload["head"] == repo.commit("discord-unstable").sha:
-                            break
-            yield from asyncio.sleep(120)
+        for repo in repos:
+            repo.refresh(conditional=True)
+            for b in repo.iter_branches():
+                #If anything actually happened
+                if b.commit != lastCommits[repo.id][b.name]:
+                    events = repo.iter_events()
+                    #Go through everything that ever happened on the repo to see what's new
+                    for i in events:
+                        #If we pushed some changes and the old commit came in just before this change
+                        if i.type == "PushEvent" and i.payload["before"] == lastCommits[repo.id][b.name].sha:
+                            #Draft the beginning of the message
+                            m = "[" + repo.name + "] " + str(i.payload["size"]) + " new commit" + ("s" if i.payload["size"] != 1 else "") + " pushed by " + i.actor.login + " <" + repo.compare_commits(i.payload["before"], i.payload["head"]).html_url + ">:\n"
+                            for c in i.payload["commits"]:
+                                #Describe each new commit
+                                m += "`" + c["sha"][:7] + "` " + c["message"] + " - " + c["author"]["name"] + " - <" + repo.commit(c["sha"]).html_url + ">\n"
+                            yield from client.send_message(client.get_channel(cfg.GITHUBCHANNEL), m)
+                            #Update the last seen commit for later
+                            lastCommits[repo.id][b.name] = repo.commit(i.payload["head"])
+                            #If this is the last event which occured between updates
+                            if i.payload["head"] == repo.commit("discord-unstable").sha:
+                                break
+                yield from asyncio.sleep(120)
 
 @asyncio.coroutine
 def processCommand(rawstring, channel, user):
@@ -377,12 +383,12 @@ def processCommand(rawstring, channel, user):
                 yield from whatIs(user, channel, message[3:])
             elif message.startswith("are "):
                 yield from whatIs(user, channel, message[4:])
-            if message.startswith("was "):
+            elif message.startswith("was "):
                 yield from whatIs(user, channel, message[4:])
             elif message.startswith("were "):
                 yield from whatIs(user, channel, message[5:])
             else:
-                yield from client.send_message(channel, "Unknown command. Please try again.")
+                yield from client.send_message(channel, "Unknown command. `@pybot help` for proper commands.")
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
@@ -397,7 +403,7 @@ def processCommand(rawstring, channel, user):
         elif cmd == "delresponse":
             yield from delResponse(message, channel)
         else:
-            yield from client.send_message(channel, "Unknown command. Please try again.")
+            yield from client.send_message(channel, "Unknown command. `@pybot help` for proper commands.")
     else:
         rawstring = rawstring.lower()
         if rawstring == "hello":
@@ -436,7 +442,7 @@ def processCommand(rawstring, channel, user):
             else:
                 yield from client.send_message(channel, "Only the server owner can make me leave!")
         else:
-            yield from client.send_message(channel, "Unknown command. Please try again.")
+            yield from client.send_message(channel, "Unknown command. `@pybot help` for proper commands.")
 
 @asyncio.coroutine
 def remind(name, channel):
@@ -481,6 +487,7 @@ def on_message(message):
 @asyncio.coroutine
 def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
-    yield from getChanges(repo, lastCommit)
+    if cfg.GITHUBCHANNEL and cfg.REPOS:
+        yield from getChanges(repos, lastCommits)
 
 client.run(cfg.TOKEN)
