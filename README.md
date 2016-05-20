@@ -9,7 +9,7 @@ This is still very unstable, so if you would like to make a pull request, please
 Pybot now requires the async branch of discord.py and consequently Python >= 3.4
 
 Incompatible with user accounts, the bot must run on a bot account.
-If that's too much hassle for you, [click here](http://bit.ly/getpybot) to rely on our running instance of the bot.
+If that's too much hassle for you, [click here](http://bit.ly/addpybot) to rely on our running instance of the bot.
 
 ## Usage
 Note: All commands must be prefaced with "@pybot"
