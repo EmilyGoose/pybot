@@ -14,7 +14,13 @@ import cfg, time, platform, ast, sys, os, re
 #Second line of import statements. These may need to be installed
 import asyncio, discord, requests, dateparser, wikipedia, github3
 wikipedia.set_lang("en")
-if cfg.GITHUBCHANNEL and cfg.REPOS:
+
+try:
+    cfg.GITHUBCHANNEL
+    cfg.REPOS
+except:
+    pass
+else:
     g = github3.GitHub()
     repos = []
     lastCommits = {}
@@ -487,7 +493,12 @@ def on_message(message):
 @asyncio.coroutine
 def on_ready():
     print(time.strftime("%Y-%m-%d %H:%M:%S") + ': Connected to Discord')
-    if cfg.GITHUBCHANNEL and cfg.REPOS:
+    try:
+        cfg.GITHUBCHANNEL
+        cfg.REPOS
+    except:
+        pass
+    else:
         yield from getChanges(repos, lastCommits)
 
 client.run(cfg.TOKEN)
