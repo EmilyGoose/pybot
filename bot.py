@@ -414,7 +414,7 @@ def processCommand(rawstring, channel, user):
         rawstring = rawstring.lower()
         if rawstring == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
-        if rawstring == "die":
+        elif rawstring == "die":
             print(user.name + " tried to kill the bot!")
             #Find the people that are allowed to kill the bot
             if user.id in cfg.KILLERIDS:
