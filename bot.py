@@ -480,15 +480,16 @@ def on_message(message):
     #if message.content.startswith("!") and len(message.content) > 1:
         #yield from processCommand(message.content[1:], message.channel, message.author)
     if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
+        yield from client.send_typing(message.channel)
         yield from processCommand(str.strip(message.content[22:]), message.channel, message.author)
     if message.content.startswith("@" + client.user.name) and len(message.content) > 7:
+        yield from client.send_typing(message.channel)
         yield from processCommand(str.strip(message.content[7:]), message.channel, message.author)
     elif message.content == "<@" + client.user.id + ">":
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
     elif message.content == "@" + client.user.name:
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
     else:
-        yield from client.send_typing(message.channel)
         yield from processResponse(message)
 @client.event
 @asyncio.coroutine
