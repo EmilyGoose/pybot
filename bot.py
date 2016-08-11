@@ -488,6 +488,7 @@ def on_message(message):
     elif message.content == "@" + client.user.name:
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
     else:
+        yield from client.send_typing(message.channel)
         yield from processResponse(message)
 @client.event
 @asyncio.coroutine
