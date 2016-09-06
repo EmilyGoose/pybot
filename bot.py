@@ -37,20 +37,24 @@ client = discord.Client()
 #Initialize help string
 helpString = """PYBOT V5 HELP
 http://github.com/MishaLarionov/pybot/tree/discord\n
-`@pybot help` shows this page
-`@pybot idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas
-`@pybot getideas <username>` Lists ideas from user. *username* can be omitted to get your own ideas.
-`@pybot delidea <n>` Deletes the idea with the number *n*
-`@pybot clearideas` Deletes ALL your ideas
-`@pybot whatis <query>` Gets a summary of the Wikipedia page for <query>
-`@pybot machineinfo` Gets server name and operating system
-`@pybot splitchannel` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run.
-`@pybot mergechannel` Makes ideas from channel available to all channels.
-`@pybot setresponse \"<response>\" for \"<call>\"` Has me respond with *response* whenever your message matches *call*
-`@pybot getresponses` Gets all automated responses
-`@pybot delresponse <call>` Deletes the response for call
-`@pybot clearresponses` Deletes ALL responses
-`@pybot getout` Makes pybot leave the server. Only usable by the owner.
+Commands are called by preceeding them with `@pybot`, `-p`, or `!`
+Examples: `@pybot help`, `-p help`, `!help`
+`help` shows this page
+`idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas
+`getideas <username>` Lists ideas from user. *username* can be omitted to get your own ideas.
+`delidea <n>` Deletes the idea with the number *n*
+`clearideas` Deletes ALL your ideas
+`whatis <query>` Gets a summary of the Wikipedia page for <query>
+`machineinfo` Gets server name and operating system
+`splitchannel` Keeps future ideas from this channel separate from others, only accessible from the channel in which this command is run.
+`mergechannel` Makes ideas from channel available to all channels.
+`setresponse \"<response>\" for \"<call>\"` Has me respond with *response* whenever your message matches *call*
+`getresponses` Gets all automated responses
+`delresponse <call>` Deletes the response for call
+`clearresponses` Deletes ALL responses
+`getout` Makes pybot leave the server. Only usable by the owner.
+
+To add me to your server visit http://bit.ly/getpybot
 """
 
 print("Setup finished")
@@ -128,7 +132,7 @@ def newIdea(text, user, channel):
             yield from debug("Something wiped the file. Restoring to previous version...")
             writeDict(dProtect, channel)
     except Exception as e:
-        yield from client.send_message(channel, "Sorry, I couldn't add your idea. Please try again!")
+        yield from client.send_message(channel, ":warning: Sorry, I couldn't add your idea. Please try again!")
         writeDict(dProtect)
     else:
         yield from client.send_message(channel, "{}'s idea has been added.".format(user.mention))
@@ -146,17 +150,17 @@ def getIdeas(name, channel):
             #Check if the user has any ideas
             if len(d[userID]) > 0:
                 #Output a numbered list of the user's ideas
-                s = ("Ideas for {}:".format(user.mention))
+                s = (":open_file_folder: Ideas for {}:".format(user.mention))
                 for i in range(0, len(d[userID])):
                     s = (s + ("\n`" + str(i+1) + ":` " + d[userID][i]))
                 yield from client.send_message(channel, s)
                 #Begin descending staircase of error messages
             else:
-                yield from client.send_message(channel, user.mention + " has not entered any ideas yet!")
+                yield from client.send_message(channel, ":warning: " + user.mention + " has not entered any ideas yet!")
         else:
-            yield from client.send_message(channel, user.mention + " has not entered any ideas yet!")
+            yield from client.send_message(channel, ":warning: " + user.mention + " has not entered any ideas yet!")
     else:
-        yield from client.send_message(channel, "Name not found! Please try again!")
+        yield from client.send_message(channel, ":warning: Name not found! Please try again!")
 
 @asyncio.coroutine
 def delIdea(num, author, channel):
@@ -169,17 +173,17 @@ def delIdea(num, author, channel):
         d = readFile(channel)
         #Make sure the number is not greater than the amount of elements
         if (num + 1) > len(d[author]) and len(d[author]) > 0:
-            client.send_message(channel, "That's more ideas than you have! You currently have " + str(len(d[author])) + " ideas entered.")
+            client.send_message(channel, ":warning: That's more ideas than you have! You currently have " + str(len(d[author])) + " ideas entered.")
         elif len(d[author]) == 0:
-            yield from client.send_message(channel, "You don't have any ideas to delete!")
+            yield from client.send_message(channel, ":warning: You don't have any ideas to delete!")
         else:
             #Get rid of the element
             e = d[author].pop(num)
             #Rebuild the dictionary
             writeDict(d, channel)
-            yield from client.send_message(channel, "Idea `" + e.replace("`", "'") + "` deleted.")
+            yield from client.send_message(channel, ":wastebasket: Idea `" + e.replace("`", "'") + "` deleted.")
     except:
-        yield from client.send_message(channel, "Invalid number. Please try again.")
+        yield from client.send_message(channel, ":warning: Invalid number. Please try again.")
 
 @asyncio.coroutine
 def splitChannel(channel):
@@ -231,19 +235,19 @@ def mergeChannel(channel):
             f2.close()
             yield from client.send_message(channel, "Successfully merged channel with the main branch.")
         except AttributeError:
-            yield from client.send_message(channel, "This channel is not attached to a server, likely a Direct Message. Ideas cannot be merged.")
+            yield from client.send_message(channel, ":warning: This channel is not attached to a server, likely a Direct Message. Ideas cannot be merged.")
     return()
 
 @asyncio.coroutine
 def clearIdeas(author, channel):
     #Grab the dictionary from the text file
     d = readFile(channel)
-    if len(d[author.id]) == 0:
-        yield from client.send_message(channel, "You don't have any ideas to delete!")
+    if (not author.id in d.keys()) or len(d[author.id]) == 0:
+        yield from client.send_message(channel, ":warning: You don't have any ideas to delete!")
     else:
         d[author.id] = []
         writeDict(d, channel)
-        yield from client.send_message(channel, "Ideas for {} cleared.".format(author.mention))
+        yield from client.send_message(channel, ":wastebasket: Ideas for {} cleared.".format(author.mention))
     
 
 def setReminder():
@@ -275,7 +279,7 @@ def setResponse(response, call, channel):
 def whatIs(user, channel, message):
     searchResults = wikipedia.search(message)
     if len(searchResults) < 1:
-        yield from client.send_message(channel, "Could not find anything matching your search, {}. Try using different keywords.".format(user.mention))
+        yield from client.send_message(channel, ":warning: Could not find anything matching your search, {}. Try using different keywords.".format(user.mention))
     else:
         try:
             page = wikipedia.page(searchResults[0], auto_suggest = True, redirect = True)
@@ -293,9 +297,9 @@ def delResponse(call, channel):
     if call in d["responses"]:
         del(d["responses"][call])
         writeDict(d, channel)
-        yield from client.send_message(channel, "Removed response.")
+        yield from client.send_message(channel, ":wastebasket: Removed response.")
     else:
-        yield from client.send_message(channel, "I don't respond to that!")
+        yield from client.send_message(channel, ":warning: I don't respond to that!")
 
 @asyncio.coroutine
 def getResponses(channel):
@@ -308,7 +312,7 @@ def getResponses(channel):
             s = (s + ("\n`" + d["responses"][i] + "` for `" + i + "`"))
         yield from client.send_message(channel, s)
     else:
-        yield from client.send_message(channel, "There are no responses here!")
+        yield from client.send_message(channel, ":warning: There are no responses here!")
 
 @asyncio.coroutine
 def clearResponses(channel):
@@ -318,9 +322,9 @@ def clearResponses(channel):
         #Bushwhack all the responses
         d["responses"] = {}
         writeDict(d, channel)
-        yield from client.send_message(channel, "Removed responses.")
+        yield from client.send_message(channel, ":wastebasket: Removed responses.")
     else:
-        yield from client.send_message(channel, "There are no responses here!")
+        yield from client.send_message(channel, ":warning: There are no responses here!")
 
 @asyncio.coroutine
 def versionInfo(channel):
@@ -333,11 +337,11 @@ def versionInfo(channel):
     unstablecode = requests.get('https://raw.githubusercontent.com/MishaLarionov/pybot/discord-unstable/bot.py')
     #Compare both code samples
     if currentcode == stablecode.text:
-        yield from client.send_message(channel, "This bot instance is up to date with the latest stable build.")
+        yield from client.send_message(channel, ":thumbsup: This bot instance is up to date with the latest stable build.")
     elif currentcode == unstablecode.text:
-        yield from client.send_message(channel, "This bot instance is up to date with the latest unstable build.")
+        yield from client.send_message(channel, ":alembic: This bot instance is up to date with the latest unstable build.")
     else:
-        yield from client.send_message(channel, "This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
+        yield from client.send_message(channel, ":warning: This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
 
 @asyncio.coroutine
 def getChanges(repos, lastCommits):
@@ -367,7 +371,7 @@ def getChanges(repos, lastCommits):
         yield from asyncio.sleep(120)
 
 @asyncio.coroutine
-def processCommand(rawstring, channel, user):
+def processCommand(rawstring, channel, user, message):
     #Process the user's commands
     if " " in rawstring:
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
@@ -394,41 +398,44 @@ def processCommand(rawstring, channel, user):
             elif message.startswith("were "):
                 yield from whatIs(user, channel, message[5:])
             else:
-                yield from client.send_message(channel, "Unknown command. `@pybot help` for proper commands.")
+                yield from client.send_message(channel, ":warning: Unknown command. `@pybot help` for a list of commands.")
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
-            yield from client.send_message(channel, "Nicholas (@ncarr) forgot to write this code.")
+            yield from client.send_message(channel, ":warning: Nicholas (@ncarr) forgot to write this code.")
         elif cmd == "help":
             yield from client.send_message(channel, helpString)
         elif cmd == "setresponse":
             try:
                 yield from setResponse(message.split("\"")[1], message.split("\"")[3], channel)
             except IndexError:
-                yield from client.send_message(channel, "Improper syntax! For me to understand responses with spaces, please put your call and response in double quotes.")
+                yield from client.send_message(channel, ":warning: Improper syntax! For me to understand responses with spaces, please put your call and response in double quotes.")
         elif cmd == "delresponse":
             yield from delResponse(message, channel)
         else:
-            yield from client.send_message(channel, "Unknown command. `@pybot help` for proper commands.")
+            yield from client.send_message(channel, ":warning: Unknown command. `@pybot help` for a list of commands.")
     else:
         rawstring = rawstring.lower()
         if rawstring == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
-        elif rawstring == "die":
+        elif rawstring == "die" or rawstring == "kys":
             print(user.name + " tried to kill the bot!")
             #Find the people that are allowed to kill the bot
             if user.id in cfg.KILLERIDS:
-                yield from client.send_message(channel, "brb dying")
+                yield from client.send_message(channel, ":robot::gun:")
+                time.sleep(1)
+                yield from client.send_message(channel, ":boom::gun:")
                 print(user.name + " has killed me! Avenge me!") 
                 sys.exit()
             else:
-                yield from client.send_message(channel, "You don't have permission to kill me! I see you don't like me, perhaps you don't understand my commands. `@pybot help` to learn more. If you really hate me, get your channel owner to send `@pybot getout`.")
+                yield from client.send_message(channel, ":warning: You don't have permission to kill me! I see you don't like me, perhaps you don't understand my commands. `@pybot help` to learn more. If you really hate me, get your channel owner to send `@pybot getout`.")
         elif rawstring == "clearideas":
             yield from clearIdeas(user, channel)
         elif rawstring == "machineinfo":
             yield from client.send_message(channel, platform.node() + " " + platform.platform())
         elif rawstring == "help":
-            yield from client.send_message(channel, helpString)
+            yield from client.send_message(user, helpString)
+            yield from client.delete_message(message)
         elif rawstring == "getideas":
             yield from getIdeas(user.name, channel)
         elif rawstring == "getresponses":
@@ -443,15 +450,16 @@ def processCommand(rawstring, channel, user):
             yield from versionInfo(channel)
         elif rawstring == "getout":
             if user == channel.server.owner:
-                yield from client.send_message(channel, "Alright, I'll leave your server.. :cry:\n(http://bit.ly/addpybot to re-add me)")
+                yield from client.send_message(channel, "Alright, I'll leave your server.. :cry:\n(http://bit.ly/getpybot to re-add me)")
                 yield from client.leave_server(channel.server)
             else:
-                yield from client.send_message(channel, "Only the server owner can make me leave!")
+                yield from client.send_message(channel, ":warning: Only the server owner can make me leave!")
         else:
-            yield from client.send_message(channel, "Unknown command. `@pybot help` for proper commands.")
+            yield from client.send_message(channel, ":warning: Unknown command. `@pybot help` for proper commands.")
 
 @asyncio.coroutine
 def remind(name, channel):
+    #Unfinished useless code
     yield from client.send_message(channel, "You asked me to remind you to" + name)
 
 @asyncio.coroutine
@@ -477,18 +485,21 @@ def on_message(message):
     if message.author == client.user:
         return
     #Uncomment this if you want to use an exclamaion mark instead of @pybot
-    #if message.content.startswith("!") and len(message.content) > 1:
-        #yield from processCommand(message.content[1:], message.channel, message.author)
+    if message.content.startswith("!") and len(message.content) > 1:
+        yield from processCommand(message.content[1:], message.channel, message.author, message)
     if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
         yield from client.send_typing(message.channel)
-        yield from processCommand(str.strip(message.content[22:]), message.channel, message.author)
+        yield from processCommand(str.strip(message.content[22:]), message.channel, message.author, message)
     if message.content.startswith("@" + client.user.name) and len(message.content) > 7:
         yield from client.send_typing(message.channel)
-        yield from processCommand(str.strip(message.content[7:]), message.channel, message.author)
-    elif message.content == "<@" + client.user.id + ">":
+        yield from processCommand(str.strip(message.content[7:]), message.channel, message.author, message)
+    elif message.content.startswith("-p"):
+        yield from client.send_typing(message.channel)
+        yield from processCommand(str.strip(message.content[3:]), message.channel, message.author, message)
+    elif message.content == "<@" + client.user.id + ">" or message.content == "-p" or message.content == "@" + client.user.name:
         yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
-    elif message.content == "@" + client.user.name:
-        yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
+    elif message.content == "sudo rm -rf":
+        yield from processCommand("clearideas", message.channel, message.author, message)
     else:
         yield from processResponse(message)
 @client.event
