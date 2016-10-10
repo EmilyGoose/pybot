@@ -406,13 +406,17 @@ def processCommand(rawstring, channel, user, message):
         elif cmd == "help":
             yield from client.send_message(channel, helpString)
         elif cmd == "setresponse":
-            try:
-                yield from setResponse(message.split("\"")[1], message.split("\"")[3], channel)
-            except IndexError:
+            if message.strip()[0] == "\"":
+                try:
+                    yield from setResponse(message.split("\"")[1], message.split("\"")[3], channel)
+                except IndexError:
+                    yield from client.send_message(channel, ":warning: Improper syntax! Please use either single or double quotes for both call and response!")
+            elif message.strip()[0] == "'":
                 try:
                     yield from setResponse(message.split("'")[1], message.split("'")[3], channel)
                 except IndexError:
                     yield from client.send_message(channel, ":warning: Improper syntax! Please use either single or double quotes for both call and response!")
+                        
         elif cmd == "delresponse":
             yield from delResponse(message, channel)
         else:
