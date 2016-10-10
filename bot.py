@@ -488,7 +488,10 @@ def processResponse(message):
 @client.event
 @asyncio.coroutine
 def on_message(message):
-    print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name + " says: " + message.content)
+    try:
+        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name + " says: " + message.content)
+    except:
+        print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name + " sent something containing emojis.")
     if message.author == client.user:
         return
     #Uncomment this if you want to use an exclamaion mark instead of @pybot
