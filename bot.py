@@ -409,7 +409,10 @@ def processCommand(rawstring, channel, user, message):
             try:
                 yield from setResponse(message.split("\"")[1], message.split("\"")[3], channel)
             except IndexError:
-                yield from client.send_message(channel, ":warning: Improper syntax! For me to understand responses with spaces, please put your call and response in double quotes.")
+                try:
+                    yield from setResponse(message.split("'")[1], message.split("'")[3], channel)
+                except IndexError:
+                    yield from client.send_message(channel, ":warning: Improper syntax! Please use either single or double quotes for both call and response!")
         elif cmd == "delresponse":
             yield from delResponse(message, channel)
         else:
