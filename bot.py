@@ -37,8 +37,8 @@ client = discord.Client()
 #Initialize help string
 helpString = """PYBOT V5 HELP
 http://github.com/MishaLarionov/pybot/tree/discord\n
-Commands are called by preceeding them with `@pybot`, `-p`, or `!`
-Examples: `@pybot help`, `-p help`, `!help`
+Commands are called by preceeding them with `-p`, or `!`
+Examples: `-p help`, `!help`
 `help` shows this page
 `idea: <text>` Records a suggestion in your name. You can see it with @pybot getideas
 `getideas <username>` Lists ideas from user. *username* can be omitted to get your own ideas.
@@ -462,7 +462,7 @@ def processCommand(rawstring, channel, user, message):
             else:
                 yield from client.send_message(channel, ":warning: Only the server owner can make me leave!")
         else:
-            yield from client.send_message(channel, ":warning: Unknown command. `@pybot help` for proper commands.")
+            yield from client.send_message(channel, ":warning: Unknown command. `-p help` for proper commands.")
 
 @asyncio.coroutine
 def remind(name, channel):
