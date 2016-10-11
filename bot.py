@@ -493,9 +493,7 @@ def on_message(message):
     except:
         print(time.strftime("%Y-%m-%d %H:%M:%S") + ": " + message.author.name + " sent something containing emojis.")
     if message.author == client.user:
-        return
-    if "NadekoFlower" in message.content:
-        yield from client.send_message(message.channel, ">pick")    
+        return  
     if message.author.bot == False:
         if message.content.startswith("!") and len(message.content) > 1:
             yield from processCommand(message.content[1:], message.channel, message.author, message)
