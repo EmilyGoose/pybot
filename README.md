@@ -83,7 +83,7 @@ Unless you REALLY want to run your own bot, you can rely on the instance run by 
 
 2. Install the async branch of [discord.py](https://github.com/Rapptz/discord.py/tree/async). You can do this through pip if you have git installed:
 
-   `pip install git+https://github.com/Rapptz/discord.py@async`
+   `pip install git+https://github.com/Rapptz/discord.py`
 
 3. Install the following libraries (`pip install <name>`). Alternatively, run dependencyInstaller.py
 
@@ -115,3 +115,7 @@ Now you're ready to run the bot! If you get any errors you've probably done some
 * Preliminary GitHub notifications
 * New UI/UX
 * New command prefixes
+
+### Fixes
+
+* No longer responds to bots
