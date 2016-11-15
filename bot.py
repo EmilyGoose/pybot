@@ -373,7 +373,11 @@ def getChanges(repos, lastCommits):
 @asyncio.coroutine
 def processCommand(rawstring, channel, user, message):
     #Process the user's commands
-    if " " in rawstring:
+    if rawstring == "help":
+        yield from client.delete_message(message)
+        yield from client.send_message(user, helpString)
+    elif " " in rawstring:
+        yield from client.send_typing(message.channel)
         (cmd, message) = rawstring.split(" ", maxsplit = 1)
         cmd = cmd.lower()
         if cmd == "hello":
@@ -403,8 +407,6 @@ def processCommand(rawstring, channel, user, message):
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
             yield from client.send_message(channel, ":warning: Nicholas (@ncarr) forgot to write this code.")
-        elif cmd == "help":
-            yield from client.send_message(channel, helpString)
         elif cmd == "setresponse":
             if message.strip()[0] == "\"":
                 try:
@@ -422,6 +424,7 @@ def processCommand(rawstring, channel, user, message):
         else:
             yield from client.send_message(channel, ":warning: Unknown command. `@pybot help` for a list of commands.")
     else:
+        yield from client.send_typing(message.channel)
         rawstring = rawstring.lower()
         if rawstring == "hello":
             yield from client.send_message(channel, 'Hello, {}!'.format(user.mention))
@@ -440,9 +443,6 @@ def processCommand(rawstring, channel, user, message):
             yield from clearIdeas(user, channel)
         elif rawstring == "machineinfo":
             yield from client.send_message(channel, platform.node() + " " + platform.platform())
-        elif rawstring == "help":
-            yield from client.send_message(user, helpString)
-            yield from client.delete_message(message)
         elif rawstring == "getideas":
             yield from getIdeas(user.name, channel)
         elif rawstring == "getresponses":
@@ -498,13 +498,10 @@ def on_message(message):
         if message.content.startswith("!") and len(message.content) > 1:
             yield from processCommand(message.content[1:], message.channel, message.author, message)
         if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
-            yield from client.send_typing(message.channel)
             yield from processCommand(str.strip(message.content[22:]), message.channel, message.author, message)
         if message.content.startswith("@" + client.user.name) and len(message.content) > 7:
-            yield from client.send_typing(message.channel)
             yield from processCommand(str.strip(message.content[7:]), message.channel, message.author, message)
         elif message.content.startswith("-p"):
-            yield from client.send_typing(message.channel)
             yield from processCommand(str.strip(message.content[3:]), message.channel, message.author, message)
         elif message.content == "<@" + client.user.id + ">" or message.content == "-p" or message.content == "@" + client.user.name:
             yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
