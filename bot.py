@@ -82,16 +82,10 @@ def readFile(channel):
                     #Literally no clue how this line works
                     d[key] = ast.literal_eval(val)
         except:
-            try:
-                #Create a new file if <server>.txt doesn't exist
-                #Or if an error happens. (99% sure this is fixed)
-                f = open("data/" + channel.server.id + ".txt", 'w')
-                f.write("responses|{}")
-            except:
-                #Create a new file if the channel doesn't exist or belong to a server
-                #Or if an error happens. (99% sure this is fixed)
-                f = open("data/" + channel.id + ".txt", 'w')
-                f.write("responses|{}")
+            #Create a new file if <server>.txt doesn't exist
+            #Or if an error happens. (99% sure this is fixed)
+            f = open("data/" + channel.server.id + ".txt", 'w')
+            f.write("responses|{}")
     f.close()
     return(d)
 
@@ -341,7 +335,7 @@ def versionInfo(channel):
     elif currentcode == unstablecode.text:
         yield from client.send_message(channel, ":alembic: This bot instance is up to date with the latest unstable build.")
     else:
-        yield from client.send_message(channel, ":warning: This bot instance does not match any known version. Please bother Misha Larionov (@Marsroverr) or Nicholas Carr (@ncarr).")
+        yield from client.send_message(channel, ":warning: This bot instance does not match any known version. This is probably a test build.")
 
 @asyncio.coroutine
 def getChanges(repos, lastCommits):
@@ -403,6 +397,8 @@ def processCommand(rawstring, channel, user, message):
                 yield from whatIs(user, channel, message[5:])
             else:
                 yield from client.send_message(channel, ":warning: Unknown command. `@pybot help` for a list of commands.")
+        elif cmd == "what's":
+            yield from whatIs(user, channel, message)
         elif cmd == "remind":
             #Code goes here someday
             print("Reminder code doesn't exist yet, please create some.")
@@ -501,7 +497,7 @@ def on_message(message):
             yield from processCommand(str.strip(message.content[22:]), message.channel, message.author, message)
         if message.content.startswith("@" + client.user.name) and len(message.content) > 7:
             yield from processCommand(str.strip(message.content[7:]), message.channel, message.author, message)
-        elif message.content.startswith("-p"):
+        elif message.content.startswith("-p") and len(message.content) > 3:
             yield from processCommand(str.strip(message.content[3:]), message.channel, message.author, message)
         elif message.content == "<@" + client.user.id + ">" or message.content == "-p" or message.content == "@" + client.user.name:
             yield from client.send_message(message.channel, 'Hello {}!'.format(message.author.mention))
