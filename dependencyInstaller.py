@@ -6,7 +6,7 @@
 
 import pip, sys
 
-libraries = ['asyncio','requests','dateparser','wikipedia', 'github3.py']
+libraries = ['asyncio','requests','dateparser','wikipedia', 'github3.py', 'lxml']
 
 for i in libraries:
     print("Installing " + i)

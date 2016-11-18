@@ -11,6 +11,7 @@ print("Loading... (This may take a while)")
 
 #Import all the stuff
 import cfg, time, platform, ast, sys, os, re
+#from html.parser import HTMLParser
 #Second line of import statements. These may need to be installed
 import asyncio, discord, requests, dateparser, wikipedia, github3
 wikipedia.set_lang("en")
@@ -130,6 +131,25 @@ def newIdea(text, user, channel):
         writeDict(dProtect)
     else:
         yield from client.send_message(channel, "{}'s idea has been added.".format(user.mention))
+
+# WIP function for the fetching of stock prices. Horribly inefficient
+# This is basically a hacked-together Google Finance API
+# I used RegEx instead of an HTML parser because pip is broken for me
+@asyncio.coroutine
+def getPrice(ticker, channel):
+    financepage = requests.get('https://www.google.com/finance?q=' + ticker).text
+    regex = re.search('<span class="pr">[\s]+(<span [a-z\_0-9"=\s]+>)+([0-9\.]+)<', financepage)
+    price = regex.group(2)
+    regex = re.search('<title>([A-Za-z\s\-]+)', financepage)
+    title = regex.group(1)
+    regex = re.search('\(([\-0-9\.]+%)\)', financepage)
+    change = regex.group(1)
+    if change[0] == "-":
+        tickerstring = ":chart_with_downwards_trend: **{}** - ${} - (Down {} Today)".format(title, price, change[1:])
+    else:
+        tickerstring = ":chart_with_upwards_trend: **{}** - ${} - (Up {} Today)".format(title, price, change)
+    yield from client.send_message(channel, tickerstring)
+    
 
 @asyncio.coroutine
 def getIdeas(name, channel):
@@ -491,6 +511,8 @@ def on_message(message):
     if message.author == client.user:
         return  
     if message.author.bot == False:
+        if message.content.startswith("$") and len(message.content) > 1 and len(message.content) < 6:
+            yield from getPrice(message.content[1:], message.channel)
         if message.content.startswith("!") and len(message.content) > 1:
             yield from processCommand(message.content[1:], message.channel, message.author, message)
         if message.content.startswith("<@" + client.user.id + ">") and len(message.content) > 22:
