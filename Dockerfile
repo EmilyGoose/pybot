@@ -4,7 +4,6 @@ FROM alpine:3.1
 RUN apk add --update python py-pip
 
 # Install app dependencies
-RUN apt-get install git
 RUN pip install asyncio
 RUN pip install requests
 RUN pip install dateparser
