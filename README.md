@@ -115,6 +115,7 @@ Now you're ready to run the bot! If you get any errors you've probably done some
 * Preliminary GitHub notifications
 * New UI/UX
 * New command prefixes
+* Stock lookup
 
 ### Fixes
 
