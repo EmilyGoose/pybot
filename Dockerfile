@@ -8,7 +8,8 @@ RUN pip install asyncio
 RUN pip install requests
 RUN pip install wikipedia
 RUN pip install github3.py
-RUN pip install git+https://github.com/Rapptz/discord.py@async
+RUN pip install discord.py
+RUN pip install lxml
 
 # Bundle app source
 COPY bot.py /src/bot.py
