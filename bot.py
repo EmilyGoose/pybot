@@ -71,6 +71,7 @@ def readFile(channel):
                 (key, val) = line.split("|", maxsplit = 1)
                 #Rebuild the dictionary
                 #Literally no clue how this line works
+                #I think this might have code injection potential.
                 d[key] = ast.literal_eval(val)
     except:
         try:
@@ -87,6 +88,26 @@ def readFile(channel):
             #Or if an error happens. (99% sure this is fixed)
             f = open("data/" + channel.server.id + ".txt", 'w')
             f.write("responses|{}")
+    f.close()
+    return(d)
+
+def readStocks(user):
+    #Function for grabbing the dictionary from the file
+    d = {}
+    try:
+        #See if the user has data
+        with open("data/stocks/" + user.id + ".txt", 'r') as f:
+            for line in f:
+                #Grab the keys and values
+                (key, val) = line.split("|", maxsplit = 1)
+                #Rebuild the dictionary
+                #Literally no clue how this line works, I think it evaluates it as JSON? 
+                d[key] = ast.literal_eval(val)
+    except:
+        #Create a new file if the data doesn't exist
+        #Or if an error happens. (99% sure this is fixed)
+        f = open("data/stocks/" + user.id + ".txt", 'w')
+        f.write("cash|10000")
     f.close()
     return(d)
 
@@ -137,18 +158,22 @@ def newIdea(text, user, channel):
 # I used RegEx instead of an HTML parser because pip is broken for me
 @asyncio.coroutine
 def getPrice(ticker, channel):
-    financepage = requests.get('https://www.google.com/finance?q=' + ticker).text
-    regex = re.search('<span class="pr">[\s]+(<span [a-z\_0-9"=\s]+>)+([0-9\.]+)<', financepage)
-    price = regex.group(2)
-    regex = re.search('<title>([A-Za-z\s\-]+)', financepage)
-    title = regex.group(1)
-    regex = re.search('\(([\-0-9\.]+%)\)', financepage)
-    change = regex.group(1)
-    if change[0] == "-":
-        tickerstring = ":chart_with_downwards_trend: **{}** - ${} - (Down {} Today)".format(title, price, change[1:])
+    try:
+        financepage = requests.get('https://www.google.com/finance?q=' + ticker).text
+        regex = re.search('<span class="pr">[\s]+(<span [a-z\_0-9"=\s]+>)+([0-9\.]+)<', financepage)
+        price = regex.group(2)
+        regex = re.search('<title>([A-Za-z\s\-]+)', financepage)
+        title = regex.group(1)
+        regex = re.search('\(([\-0-9\.]+%)\)', financepage)
+        change = regex.group(1)
+    except:
+        yield from client.send_message(channel, ":warning: Stock not found! \n ```Make sure you're using the correct stock symbol. If it still doesn't work, create an issue on the git repo.```")   
     else:
-        tickerstring = ":chart_with_upwards_trend: **{}** - ${} - (Up {} Today)".format(title, price, change)
-    yield from client.send_message(channel, tickerstring)
+        if change[0] == "-":
+            tickerstring = ":chart_with_downwards_trend: **{}** - ${} - (Down {} Today)".format(title, price, change[1:])
+        else:
+            tickerstring = ":chart_with_upwards_trend: **{}** - ${} - (Up {} Today)".format(title, price, change)
+        yield from client.send_message(channel, tickerstring)
     
 
 @asyncio.coroutine
@@ -511,7 +536,7 @@ def on_message(message):
     if message.author == client.user:
         return  
     if message.author.bot == False:
-        if message.content.startswith("$") and len(message.content) > 1 and len(message.content) < 6:
+        if message.content.startswith("$") and len(message.content) > 1 and len(message.content) <= 6:
             yield from getPrice(message.content[1:], message.channel)
         if message.content.startswith("!") and len(message.content) > 1:
             yield from processCommand(message.content[1:], message.channel, message.author, message)

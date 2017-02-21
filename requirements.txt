@@ -4,4 +4,4 @@ dateparser
 wikipedia
 github3.py
 lxml
-git+https://github.com/Rapptz/discord.py@async
+discord.py
