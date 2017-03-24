@@ -98,16 +98,8 @@ RUN cd /usr/local/bin \
 	&& ln -s python3-config python-config
 
 # Install app dependencies
-<<<<<<< HEAD
+
 RUN pip install -r requirements.txt
-=======
-RUN pip install asyncio
-RUN pip install requests
-RUN pip install wikipedia
-RUN pip install github3.py
-RUN pip install discord.py
-RUN pip install lxml
->>>>>>> b5adfa3a380183935c471eac76d62742b737b22b
 
 # Bundle app source
 COPY bot.py /src/bot.py
