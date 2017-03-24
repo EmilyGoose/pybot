@@ -8,11 +8,6 @@ ENV PATH /usr/local/bin:$PATH
 # > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
 ENV LANG C.UTF-8
 
-# install ca-certificates so that HTTPS works consistently
-# the other runtime dependencies for Python are installed later
-RUN apk add --no-cache ca-certificates
-
-ENV GPG_KEY 0D96DF4D4110E5C43FBFB17F2D347EA6AA65421D
 ENV PYTHON_VERSION 3.6.1
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
@@ -103,7 +98,16 @@ RUN cd /usr/local/bin \
 	&& ln -s python3-config python-config
 
 # Install app dependencies
+<<<<<<< HEAD
 RUN pip install -r requirements.txt
+=======
+RUN pip install asyncio
+RUN pip install requests
+RUN pip install wikipedia
+RUN pip install github3.py
+RUN pip install discord.py
+RUN pip install lxml
+>>>>>>> b5adfa3a380183935c471eac76d62742b737b22b
 
 # Bundle app source
 COPY bot.py /src/bot.py
