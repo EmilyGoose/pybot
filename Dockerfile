@@ -15,7 +15,7 @@ ENV PYTHON_PIP_VERSION 9.0.1
 
 # Install app dependencies
 
-COPY requirements.txt /src/requirements.txt8:38 PM 2017-03-23
+COPY requirements.txt /src/requirements.txt
 RUN pip install -r requirements.txt
 
 # Bundle app source
