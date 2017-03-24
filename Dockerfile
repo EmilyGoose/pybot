@@ -20,4 +20,4 @@ COPY bot.py /src/bot.py
 COPY dependencyInstaller.py /src/dependencyInstaller.py
 COPY requirements.txt /src/requirements.txt
 
-CMD ["python3"]
+CMD ["python"]
