@@ -14,4 +14,3 @@ for i in libraries:
     print("Installed " + i)
 
 print("\nAll library dependencies installed.")
-input()

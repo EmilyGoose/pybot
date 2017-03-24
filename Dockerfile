@@ -15,10 +15,9 @@ ENV PYTHON_PIP_VERSION 9.0.1
 
 # Install app dependencies
 
-COPY requirements.txt /src/requirements.txt
-RUN pip install -r requirements.txt
-
 # Bundle app source
 COPY bot.py /src/bot.py
+COPY dependencyInstaller.py /src/dependencyInstaller.py
+COPY requirements.txt /src/requirements.txt
 
-CMD ["python3", "/src/bot.py"]
+CMD ["python3"]
